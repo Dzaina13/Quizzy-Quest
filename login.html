@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In / Sign Up</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-section">
+            <h1>Sign in</h1>
+            <div class="social-login">
+                <a href="url" class="social-icon">
+                    <img src="google.png" alt="Google">
+                </a>
+                <a href="url" class="social-icon">
+                    <img src="facebook.png" alt="Facebook">
+                </a>
+            </div>
+            <p class="or-text">atau gunakan akun anda</p>
+            <form id="loginForm"> 
+                <input type="email" placeholder="Email" class="input-field" id="email">
+                <input type="password" placeholder="Password" class="input-field" id="password">
+                <a href="#" class="forgot-password">Lupa kata sandi anda?</a>
+                <button type="submit" class="sign-in-button">SIGN IN</button> 
+            </form>
+        </div>
+        <div class="signup-section">
+            <h1>Halo, Teman!</h1>
+            <p>Daftarkan diri anda dan mulai gunakan layanan kami segera.</p>
+            <a href="register.html" class="sign-up-button">SIGN UP</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            setTimeout(function() {
+                alert("Login Anda berhasil!");
+                window.location.href = "index.html";
+            }, 1000); 
+        });
+    </script>
+</body>
+</html>
