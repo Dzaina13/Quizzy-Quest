@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekap Quiz</title>
+    <link rel="stylesheet" href="../assets/css/rekap.css"> <!-- File CSS khusus rekap -->
+</head>
+<body>
+    <div class="rekap-container">
+        <!-- Header Rekap -->
+        <h1 class="rekap-title">Rekap Quiz</h1>
+
+        <!-- Skor Akhir -->
+        <div class="score-summary">
+            <p class="score-text">Skor Akhir:</p>
+            <p id="finalScore" class="score-value">0</p>
+        </div>
+
+        <!-- Detail Pertanyaan -->
+        <div class="question-details">
+            <h2 class="details-title">Detail Pertanyaan</h2>
+            <ul id="questionList" class="details-list">
+                <!-- Detail pertanyaan akan ditampilkan di sini -->
+            </ul>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="action-buttons">
+            <button id="restartQuizButton" class="auth-button restart-button">Main Lagi</button>
+            <button id="backToLobbyButton" class="auth-button back-to-lobby-button">Kembali ke Lobby</button>
+        </div>
+    </div>
+
+    <script src="../assets/js/quiz-parser.js"></script>
+    <script>
+        // Ambil data dari localStorage
+        const playerName = localStorage.getItem('playerName');
+        const quizQuestions = JSON.parse(localStorage.getItem('quizQuestions'));
+        const quizScore = parseInt(localStorage.getItem('quizScore')) || 0;
+
+        if (!playerName || !quizQuestions) {
+            alert("Data tidak tersedia!");
+            window.location.href = "pre-lobby.html";
+        }
+
+        // Tampilkan skor akhir
+        document.getElementById('finalScore').textContent = quizScore;
+
+        // Tampilkan detail pertanyaan
+        const questionList = document.getElementById('questionList');
+        quizQuestions.forEach((question, index) => {
+            const userAnswer = localStorage.getItem(`userAnswer_${index}`) || 'Tidak dijawab';
+            const isCorrect = userAnswer === question.correct_answer;
+
+            const listItem = document.createElement('li');
+            listItem.className = 'question-item';
+            listItem.innerHTML = `
+                <p class="question">${question.question}</p>
+                <p class="answer-info">
+                    Jawaban kamu: <span class="${isCorrect ? 'correct' : 'incorrect'}">${userAnswer}</span><br>
+                    Jawaban yang benar: <span class="correct-answer">${question.correct_answer}</span>
+                </p>
+            `;
+            questionList.appendChild(listItem);
+        });
+
+        // Tombol Main Lagi
+        document.getElementById('restartQuizButton').addEventListener('click', () => {
+            localStorage.removeItem('quizScore'); // Hapus skor lama
+            window.location.href = "quiz.html"; // Redirect ke halaman quiz
+        });
+
+        // Tombol Kembali ke Lobby
+        document.getElementById('backToLobbyButton').addEventListener('click', () => {
+            localStorage.removeItem('quizScore'); // Hapus skor lama
+            window.location.href = "lobby.html"; // Redirect ke halaman lobby
+        });
+    </script>
+</body>
+</html>

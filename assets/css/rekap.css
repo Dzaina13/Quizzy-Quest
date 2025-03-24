@@ -1,0 +1,142 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: auto;
+}
+
+/* Rekap Container */
+.rekap-container {
+    max-width: 600px;
+    width: 100%;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+/* Rekap Title */
+.rekap-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #4CAF50;
+    margin-bottom: 1rem;
+}
+
+/* Score Summary */
+.score-summary {
+    margin-bottom: 2rem;
+}
+
+.score-text {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.score-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+/* Question Details */
+.question-details {
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.details-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.details-list {
+    list-style: none;
+    padding: 0;
+}
+
+.question-item {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+.question {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.answer-info {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.correct {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.incorrect {
+    color: #FF5722;
+    font-weight: bold;
+}
+
+.correct-answer {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.auth-button {
+    padding: 0.8rem 2rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.restart-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.restart-button:hover {
+    background-color: #3e8e41;
+    transform: scale(1.05);
+}
+
+.back-to-lobby-button {
+    background-color: #FFC107;
+    color: #333;
+}
+
+.back-to-lobby-button:hover {
+    background-color: #FFA000;
+    transform: scale(1.05);
+}

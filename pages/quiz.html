@@ -4,13 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz</title>
-    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/quiz.css"> <!-- Hanya quiz.css -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="quiz-container">
         <!-- Header Quiz -->
-        <h1 class="quiz-title">Quiz</h1>
-        <p class="quiz-progress">Pertanyaan <span id="currentQuestionNumber">1</span> dari <span id="totalQuestions">5</span></p>
+        <div class="quiz-header">
+            <p class="quiz-progress">Pertanyaan <span id="currentQuestionNumber">1</span>/<span id="totalQuestions">5</span></p>
+        </div>
 
         <!-- Pertanyaan -->
         <div id="quizContent" class="quiz-content">
@@ -20,17 +24,21 @@
         <!-- Feedback Jawaban -->
         <div id="feedbackMessage" class="feedback-message"></div>
 
-        <!-- Tombol Navigasi -->
-        <div class="quiz-actions">
-            <button id="nextQuestionButton" class="auth-button next-question-button">Lanjut</button>
+        <!-- Pilihan Ganda -->
+        <div id="optionsContainer" class="options-container">
+            <!-- Pilihan ganda akan ditampilkan di sini -->
         </div>
+
+        <!-- Progress Bar -->
+        <div id="progressBar" class="progress-bar"></div>
     </div>
 
     <script src="../assets/js/quiz-parser.js"></script>
     <script>
         // Ambil data pertanyaan dari localStorage
         const quizQuestions = JSON.parse(localStorage.getItem('quizQuestions'));
-        if (!quizQuestions) {
+        if (!quizQuestions || quizQuestions.length === 0) {
+            console.error("No questions found in localStorage!"); // Debugging
             alert("Tidak ada pertanyaan tersedia!");
             window.location.href = "pre-lobby.html";
         }
@@ -41,56 +49,95 @@
         // Fungsi untuk menampilkan pertanyaan
         function displayQuestion(index) {
             const questionData = quizQuestions[index];
-            const { question, option_a, option_b, option_c, option_d } = questionData;
+            console.log("Current Question Data:", questionData); // Debugging
+
+            if (!questionData) {
+                console.error("Invalid question data at index:", index); // Debugging
+                return;
+            }
 
             document.getElementById('quizContent').innerHTML = `
-                <p class="quiz-question">${question}</p>
-                <label><input type="radio" name="answer" value="A"> ${option_a}</label><br>
-                <label><input type="radio" name="answer" value="B"> ${option_b}</label><br>
-                <label><input type="radio" name="answer" value="C"> ${option_c}</label><br>
-                <label><input type="radio" name="answer" value="D"> ${option_d}</label><br>
+                <p class="quiz-question">${questionData.question}</p>
             `;
 
             // Update progress
             document.getElementById('currentQuestionNumber').textContent = index + 1;
             document.getElementById('totalQuestions').textContent = quizQuestions.length;
 
-            // Reset feedback message
-            document.getElementById('feedbackMessage').textContent = '';
+            // Tampilkan pilihan ganda
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = ''; // Bersihkan konten sebelumnya
+
+            ['A', 'B', 'C', 'D'].forEach(option => {
+                const optionText = questionData[`option_${option.toLowerCase()}`];
+                console.log(`Option ${option}: ${optionText}`); // Debugging
+
+                const optionBox = document.createElement('div');
+                optionBox.className = 'option-box';
+                optionBox.textContent = `${option}. ${optionText}`;
+                optionBox.addEventListener('click', () => handleAnswer(option));
+                optionsContainer.appendChild(optionBox);
+            });
+        }
+
+        // Fungsi untuk menangani jawaban
+        function handleAnswer(selectedOption) {
+            const correctAnswer = quizQuestions[currentQuestionIndex].correct_answer;
+
+            // Nonaktifkan semua pilihan setelah jawaban dipilih
+            document.querySelectorAll('.option-box').forEach(box => {
+                box.style.pointerEvents = 'none';
+            });
+
+            // Ubah warna latar belakang berdasarkan jawaban
+            const isCorrect = selectedOption === correctAnswer;
+            document.body.style.backgroundColor = isCorrect ? '#4CAF50' : '#FF5722';
+            document.getElementById('feedbackMessage').textContent = isCorrect
+                ? 'Jawaban kamu benar! ✅'
+                : `Jawaban kamu salah! ❌ Jawaban yang benar adalah: ${correctAnswer}`;
+
+            // Tambahkan skor jika jawaban benar
+            if (isCorrect) score++;
+
+            // Mulai progress bar
+            startProgressBar();
+        }
+
+        // Fungsi untuk memulai progress bar
+        function startProgressBar() {
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = '0%';
+            progressBar.style.transition = 'none';
+            setTimeout(() => {
+                progressBar.style.transition = 'width 4s linear';
+                progressBar.style.width = '100%';
+
+                // Pindah ke pertanyaan berikutnya setelah 4 detik
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < quizQuestions.length) {
+                        resetQuizUI();
+                        displayQuestion(currentQuestionIndex);
+                    } else {
+                        // Simpan skor ke localStorage dan redirect ke halaman rekap
+                        localStorage.setItem('quizScore', score);
+                        window.location.href = "rekap.html";
+                    }
+                }, 4000);
+            }, 50);
+        }
+
+        // Fungsi untuk mereset UI setelah transisi
+        function resetQuizUI() {
+            document.body.style.backgroundColor = '#fff'; // Reset warna latar belakang
+            document.getElementById('feedbackMessage').textContent = ''; // Hapus feedback
+            document.querySelectorAll('.option-box').forEach(box => {
+                box.style.pointerEvents = 'auto'; // Aktifkan kembali pilihan
+            });
         }
 
         // Tampilkan pertanyaan pertama saat halaman dimuat
         displayQuestion(currentQuestionIndex);
-
-        // Handle tombol lanjut
-        document.getElementById('nextQuestionButton').addEventListener('click', () => {
-            const selectedAnswer = document.querySelector('input[name="answer"]:checked');
-            if (!selectedAnswer) {
-                document.getElementById('feedbackMessage').textContent = 'Silakan pilih jawaban terlebih dahulu!';
-                return;
-            }
-
-            // Cek jawaban
-            const correctAnswer = quizQuestions[currentQuestionIndex].correct_answer;
-            if (selectedAnswer.value === correctAnswer) {
-                score++;
-                document.getElementById('feedbackMessage').textContent = 'Jawaban kamu benar! ✅';
-            } else {
-                document.getElementById('feedbackMessage').textContent = 'Jawaban kamu salah! ❌ Jawaban yang benar adalah: ' + correctAnswer;
-            }
-
-            // Pindah ke pertanyaan berikutnya
-            currentQuestionIndex++;
-            if (currentQuestionIndex < quizQuestions.length) {
-                setTimeout(() => {
-                    displayQuestion(currentQuestionIndex);
-                }, 1000); // Delay 1 detik sebelum menampilkan pertanyaan berikutnya
-            } else {
-                // Simpan skor ke localStorage
-                localStorage.setItem('quizScore', score);
-                window.location.href = "rekap.html"; // Redirect ke halaman rekap
-            }
-        });
     </script>
 </body>
 </html>
