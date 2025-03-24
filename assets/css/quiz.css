@@ -1,0 +1,78 @@
+/* Quiz Container */
+.quiz-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #fff;
+    color: #333;
+    border-radius: 20px; /* Corner radius besar */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.quiz-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #4CAF50;
+    margin-bottom: 1rem;
+}
+
+.quiz-progress {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.quiz-content {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.quiz-question {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.quiz-content label {
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.feedback-message {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: #FF5722; /* Warna merah untuk pesan salah */
+}
+
+.feedback-message.success {
+    color: #4CAF50; /* Warna hijau untuk pesan benar */
+}
+
+/* Tombol Aksi */
+.quiz-actions {
+    margin-top: 2rem;
+}
+
+.auth-button {
+    padding: 0.8rem 2rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.next-question-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.next-question-button:hover {
+    background-color: #3e8e41;
+    transform: scale(1.05);
+}

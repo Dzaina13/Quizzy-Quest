@@ -1,0 +1,7 @@
+room_id,title,question,option_a,option_b,option_c,option_d,correct_answer
+1,Room 1 - General Knowledge,What is the capital of France?,Paris,Berlin,London,Madrid,A
+1,Room 1 - General Knowledge,Which planet is closest to the Sun?,Earth,Venus,Mercury,Mars,C
+2,Room 2 - Science Quiz,What is the chemical symbol for water?,H2O,CO2,O2,N2,A
+2,Room 2 - Science Quiz,What is the process by which plants make food?,Photosynthesis,Respiration,Transpiration,Evaporation,A
+3,Room 3 - Math Quiz,What is 5 + 7?,10,12,14,16,B
+3,Room 3 - Math Quiz,What is the square root of 64?,6,7,8,9,C

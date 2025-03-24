@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Lobby Quiz</title>
+    <link rel="stylesheet" href="../assets/css/pre-lobby.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="register-section">
+            <h1 class="auth-title">Masuk ke Room Quiz</h1>
+            <form id="preLobbyForm" class="auth-form">
+                <input type="text" placeholder="Nama Anda" class="input-field" id="playerName">
+                <input type="number" placeholder="Nomor Room Quiz" class="input-field" id="roomNumber">
+                <button type="submit" class="auth-button join-button">Gabung Room</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../assets/js/main.js"></script>
+    <script>
+        document.getElementById('preLobbyForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const playerName = document.getElementById('playerName').value;
+            const roomNumber = document.getElementById('roomNumber').value;
+
+            if (!playerName || !roomNumber) {
+                alert("Silakan isi nama dan nomor room!");
+                return;
+            }
+
+            // Simpan data ke localStorage
+            localStorage.setItem('playerName', playerName);
+            localStorage.setItem('roomNumber', roomNumber);
+
+            // Redirect ke halaman lobby
+            window.location.href = "lobby.html";
+        });
+    </script>
+</body>
+</html>
