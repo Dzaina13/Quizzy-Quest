@@ -1,48 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizzyQuest</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Quizzy Quest - Beranda</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <main class="main">
-        <header class="header">
-            <a href="logo.jpg" class="logo">Quiz.</a>
-            <nav class="navbar">
-                <a href="home.html" class="active">Home</a>
-                <a href="about.html">About</a>
-                <a href="services.html">Services</a>
-                <a href="Contact.html">Contact</a>
-                <a href="login.html" class="btn">Sign In</a> 
-                <a href="register.html" class="btn">Sign Up</a> 
+    <!-- Header -->
+    <header id="site-header">
+        <div class="header-container">
+            <img src="assets/images/logo.png" alt="Quizzy Quest Logo" class="site-logo">
+            <nav class="main-navigation">
+                <ul class="nav-links">
+                    <li><a href="pages/login.html" class="nav-link">Login</a></li>
+                    <li><a href="pages/register.html" class="nav-link">Register</a></li>
+                </ul>
             </nav>
-        </header>
+        </div>
+    </header>
 
-        <section class="home">
-            <div class="home-content">
-                <h1>Quiz Website</h1>
-                <p>Quiziz Quest adalah aplikasi seru untuk mengasah pengetahuan dan bersaing dengan teman-temanmu. Mulai petualangan kuismu sekarang!</p>
-                <label for="popup-toggle" class="start-btn">Start Quiz</label>
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Join Quiz Section -->
+        <section class="join-quiz-section">
+            <h2 class="section-title">Gabung Sekarang!</h2>
+            <p class="section-description">Mulai petualangan kuismu hari ini.</p>
+            <a href="pages/lobby.html" class="join-quiz-button">Masuk ke Lobby Quiz</a>
+        </section>
+
+        <!-- Carousel Section -->
+        <section class="carousel-section">
+            <div class="carousel-container">
+                <div class="carousel-card active">
+                    <img src="assets/images/carousel/card1.png" alt="Carousel Image 1" class="carousel-image">
+                
+                </div>
+                <div class="carousel-card">
+                    <img src="assets/images/carousel/card1.png" alt="Carousel Image 2" class="carousel-image">
+               
+                </div>
+                <div class="carousel-card">
+                    <img src="assets/images/carousel/card1.png" alt="Carousel Image 3" class="carousel-image">
+                    
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Sections -->
+        <section class="features-section">
+            <h2 class="section-title">Apa yang Kami Tawarkan?</h2>
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <h3 class="card-title">Membuat Quiz</h3>
+                    <p class="card-description">Buat quiz sendiri dan tantang teman-temanmu.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="card-title">Right or False</h3>
+                    <p class="card-description">Tes pengetahuanmu dengan pertanyaan benar atau salah.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="card-title">Decision Maker</h3>
+                    <p class="card-description">Ambil keputusan berdasarkan hasil dari quiz.</p>
+                </div>
             </div>
         </section>
     </main>
 
-    <input type="checkbox" id="popup-toggle" style="display: none;">
-
-    <div class="popup-info">
-        <h2>Quiz Quest</h2>
-        <span class="info">1. Pilih kategori kuis.</span>
-        <span class="info">2. Jawab pertanyaan dengan cepat dan tepat.</span>
-        <span class="info">3. Kumpulkan poin untuk memenangkan hadiah.</span>
-        <span class="info">4. Tantang temanmu untuk bermain bersama.</span>
-        <span class="info">5. Nikmati perjalanan belajarmu dengan kuis seru!</span>
-
-        <div class="btn-group">
-            <label for="popup-toggle" class="info-btn exit-btn">Exit Quiz</label>
-            <a href="input_data.html" class="info-btn continu-btn">Continue</a>
+    <!-- Footer -->
+    <footer id="site-footer">
+        <div class="footer-top">
+            <div class="cta-section">
+                <h3 class="cta-title">Tertarik? Gabung Sekarang!</h3>
+                <a href="pages/register.html" class="cta-button">Daftar Sekarang</a>
+            </div>
+            <div class="sitemap-section">
+                <h3 class="sitemap-title">Peta Situs</h3>
+                <ul class="sitemap-links">
+                    <li><a href="index.html">Beranda</a></li>
+                    <li><a href="pages/login.html">Login</a></li>
+                    <li><a href="pages/register.html">Register</a></li>
+                    <li><a href="pages/lobby.html">Lobby Quiz</a></li>
+                </ul>
+            </div>
+            <div class="contact-section">
+                <h3 class="contact-title">Kontak Kami</h3>
+                <p class="contact-info">Email: support@quizzyquest.com</p>
+                <p class="contact-info">Telepon: +123-456-7890</p>
+            </div>
         </div>
-    </div>
+        <div class="footer-bottom">
+            <p class="copyright-text">© 2023 Quizzy Quest. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/scroll-effects.js"></script>
 </body>
 </html>

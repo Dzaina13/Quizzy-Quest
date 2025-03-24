@@ -1,0 +1,163 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to bottom, #FE7E87, #424F60);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Container utama */
+.auth-container {
+    display: flex;
+    max-width: 900px;
+    width: 100%;
+    border-radius: 20px; /* Corner radius besar */
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Left Section */
+.left-section {
+    flex: 1;
+    background-color: #424F60;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 510px; /* Sesuaikan dengan tinggi yang diinginkan */
+    overflow: hidden;
+}
+
+/* Gambar di dalam Left Section */
+.auth-image {
+    width: 100%;   /* Gambar mengikuti lebar left-section */
+    height: 100%;  /* Gambar mengikuti tinggi left-section */
+    object-fit: cover; /* Agar gambar tetap proporsional */
+}
+
+
+/* Right Section */
+.right-section {
+    flex: 1;
+    background-color: #fff;
+    color: #333;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Titles and Descriptions */
+.auth-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.or-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+/* Social Login */
+.social-login {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.social-icon img {
+    width: 400px;
+    height: 400px;
+    border-radius: 50%; /* Ikon bulat */
+    transition: transform 0.3s ease;
+}
+
+.social-icon img:hover {
+    transform: scale(1.1); /* Efek hover zoom */
+}
+
+/* Form Styling */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.input-field {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 10px; /* Corner radius besar */
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.input-field:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+.forgot-password-link {
+    font-size: 0.9rem;
+    color: #4CAF50;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.forgot-password-link:hover {
+    color: #3e8e41;
+}
+
+/* Buttons */
+.auth-button {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    border-radius: 10px; /* Corner radius besar */
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.sign-in-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.sign-in-button:hover {
+    background-color: #3e8e41;
+}
+
+/* Sign Up Text */
+.signup-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 1rem;
+}
+
+.signup-link {
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.signup-link:hover {
+    color: #3e8e41;
+}

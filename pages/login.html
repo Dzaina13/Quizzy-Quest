@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link rel="stylesheet" href="../assets/css/login.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <!-- Left Section: Image -->
+        <div class="left-section">
+            <img src="../assets/images/login.png" alt="Illustration" class="auth-image">
+        </div>
+
+        <!-- Right Section: Login Form -->
+        <div class="right-section">
+            <h1 class="auth-title">Sign In</h1>
+            <div class="social-login">
+                <a href="#" class="social-icon">
+                    <img src="assets/images/google.png" alt="Google">
+                </a>
+                <a href="#" class="social-icon">
+                    <img src="assets/images/facebook.png" alt="Facebook">
+                </a>
+            </div>
+            <p class="or-text">atau gunakan akun Anda</p>
+            <form id="loginForm" class="auth-form">
+                <input type="email" placeholder="Email" class="input-field" id="email">
+                <input type="password" placeholder="Password" class="input-field" id="password">
+                <a href="#" class="forgot-password-link">Lupa kata sandi?</a>
+                <button type="submit" class="auth-button sign-in-button">SIGN IN</button>
+            </form>
+            <p class="signup-text">Belum punya akun? <a href="register.html" class="signup-link">Sign Up</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Simulasi validasi login
+            setTimeout(function() {
+                alert("Login berhasil!");
+                window.location.href = "index.html";
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
