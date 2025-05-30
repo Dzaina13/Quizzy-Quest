@@ -17,38 +17,18 @@
         <!-- Register Section -->
         <div class="register-section">
             <h1 class="auth-title">Register</h1>
-            <form id="registerForm" class="auth-form">
-                <input type="text" placeholder="Nama Lengkap" class="input-field" id="fullName">
-                <input type="email" placeholder="Email" class="input-field" id="email">
-                <input type="password" placeholder="Password" class="input-field" id="password">
-                <input type="password" placeholder="Konfirmasi Password" class="input-field" id="confirmPassword">
+            <form id="registerForm" class="auth-form" action="../assets/php/register_process.php" method="POST">
+                <input type="text" name="fullname" placeholder="Nama Lengkap" class="input-field" required>
+                <input type="email" name="email" placeholder="Email" class="input-field" required>
+                <input type="password" name="password" placeholder="Password" class="input-field" required>
+                <input type="password" name="confirmPassword" placeholder="Konfirmasi Password" class="input-field" required>
                 <button type="submit" class="auth-button register-button">REGISTER</button>
             </form>
+
             <p class="login-text">Sudah punya akun? <a href="login.html" class="login-link">Login</a></p>
         </div>
     </div>
 
-    <script>
-        document.getElementById('registerForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const fullName = document.getElementById('fullName').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            // Validasi password
-            if (password !== confirmPassword) {
-                alert("Password dan Konfirmasi Password tidak cocok.");
-                return;
-            }
-
-            // Simulasi validasi registrasi
-            setTimeout(function() {
-                alert("Pendaftaran berhasil!");
-                window.location.href = "login.html";
-            }, 1000);
-        });
-    </script>
+   
 </body>
 </html>

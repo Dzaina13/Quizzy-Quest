@@ -28,28 +28,15 @@
                 </a>
             </div>
             <p class="or-text">atau gunakan akun Anda</p>
-            <form id="loginForm" class="auth-form">
-                <input type="email" placeholder="Email" class="input-field" id="email">
-                <input type="password" placeholder="Password" class="input-field" id="password">
-                <a href="#" class="forgot-password-link">Lupa kata sandi?</a>
+            <form id="loginForm" class="auth-form" action="../assets/php/login_process.php" method="POST">
+                <input type="email" name="email" placeholder="Email" class="input-field" required>
+                <input type="password" name="password" placeholder="Password" class="input-field" required>
+                    <a href="#" class="forgot-password-link">Lupa kata sandi?</a>
                 <button type="submit" class="auth-button sign-in-button">SIGN IN</button>
             </form>
+
             <p class="signup-text">Belum punya akun? <a href="register.html" class="signup-link">Sign Up</a></p>
         </div>
     </div>
-
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            // Simulasi validasi login
-            setTimeout(function() {
-                alert("Login berhasil!");
-                window.location.href = "index.html";
-            }, 1000);
-        });
-    </script>
 </body>
 </html>
