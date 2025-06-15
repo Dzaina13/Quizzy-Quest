@@ -1,26 +1,67 @@
 <?php
 session_start();
-include 'koneksi_db.php';
 
-$email = $_POST['email'];
-$password = $_POST['password'];
+// Include koneksi database
+require_once 'koneksi_db.php';
 
-$stmt = $koneksi->prepare("SELECT user_id, username, password_hash, role FROM users WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows === 1) {
-    $user = $result->fetch_assoc();
-    if (password_verify($password, $user['password_hash'])) {
-        $_SESSION['user_id'] = $user['user_id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
-        header("Location: ../../pages/lobby.html");
-        exit;
-    }
+// Cek apakah request adalah POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ../../pages/login.php?error=invalid_request');
+    exit();
 }
 
-header("Location: ../../pages/login.html?error=invalid_credentials");
-exit;
+// Ambil dan sanitasi input
+$email = trim($_POST['email']);
+$password = trim($_POST['password']);
+
+// Validasi input kosong
+if (empty($email) || empty($password)) {
+    header('Location: ../../pages/login.php?error=empty_fields&email=' . urlencode($email));
+    exit();
+}
+
+// Validasi format email
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    header('Location: ../../pages/login.php?error=invalid_email&email=' . urlencode($email));
+    exit();
+}
+
+// Escape input untuk keamanan
+$email = $koneksi->real_escape_string($email);
+
+// Query untuk mencari user berdasarkan email
+$sql = "SELECT user_id, username, email, password_hash FROM users WHERE email = '$email'";
+$result = $koneksi->query($sql);
+
+if ($result && $result->num_rows > 0) {
+    $user = $result->fetch_assoc();
+    
+    // Cek password
+    if (password_verify($password, $user['password_hash'])) {
+        
+        // SET SESSION
+        $_SESSION['user_logged_in'] = true;
+        $_SESSION['user_id'] = $user['user_id'];
+        $_SESSION['user_name'] = $user['username'];
+        $_SESSION['user_email'] = $user['email'];
+        
+
+        
+        // Redirect ke lobby
+        header('Location: ../../pages/lobby.php');
+        exit();
+        
+    } else {
+        // Password salah
+        header('Location: ../../pages/login.php?error=invalid_credentials&email=' . urlencode($_POST['email']));
+        exit();
+    }
+} else {
+    // User tidak ditemukan
+    header('Location: ../../pages/login.php?error=invalid_credentials&email=' . urlencode($_POST['email']));
+    exit();
+}
+
+// Tutup koneksi
+
 ?>
