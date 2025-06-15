@@ -48,7 +48,7 @@ if ($result && $result->num_rows > 0) {
 
         
         // Redirect ke lobby
-        header('Location: ../../pages/lobby.php');
+        header('Location: ../../pages/dashboard.php');
         exit();
         
     } else {
