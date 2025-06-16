@@ -134,7 +134,7 @@ if ($sessions_result) {
                         <a href="create_quiz.php" class="text-gray-600 hover:text-purple-600 font-medium transition-colors">
                             <i class="fas fa-plus mr-2"></i>Buat Quiz
                         </a>
-                        <a href="join_session.php" class="text-gray-600 hover:text-purple-600 font-medium transition-colors">
+                        <a href="join_room.php" class="text-gray-600 hover:text-purple-600 font-medium transition-colors">
                             <i class="fas fa-sign-in-alt mr-2"></i>Join Session
                         </a>
                     </div>
@@ -261,7 +261,7 @@ if ($sessions_result) {
                 </div>
             </a>
 
-            <a href="join_session.php" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 group">
+            <a href="join_room.php" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 group">
                 <div class="text-center">
                     <div class="p-4 rounded-full bg-green-100 text-green-600 inline-block group-hover:bg-green-200 transition-colors">
                         <i class="fas fa-sign-in-alt text-3xl"></i>
@@ -359,7 +359,7 @@ if ($sessions_result) {
                                             <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
                                                 <i class="fas fa-users mr-1"></i><?php echo $session['participant_count']; ?> bergabung
                                             </span>
-                                            <a href="join_session.php" class="bg-green-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-green-600 transition-colors">
+                                            <a href="join_room.php" class="bg-green-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-green-600 transition-colors">
                                                 Bergabung
                                             </a>
                                         </div>
