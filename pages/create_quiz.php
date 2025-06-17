@@ -156,7 +156,7 @@ $username = $_SESSION['user_name'] ?? 'User';
 
         <!-- Main Form -->
         <div class="bg-white rounded-xl card-shadow p-8">
-            <form id="createQuizForm" method="POST" action="process_create_quiz.php">
+            <form id="createQuizForm" method="POST" action="../assets/php/process_create_quiz.php">
                 <input type="hidden" name="created_by" value="<?php echo $user_id; ?>">
                 
                 <!-- Quiz Information Section -->
@@ -167,7 +167,7 @@ $username = $_SESSION['user_name'] ?? 'User';
                         </div>
                         <h2 class="text-2xl font-bold text-gray-800">Informasi Quiz</h2>
                     </div>
-                    
+                     
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
                             <label for="quiz_title" class="block text-sm font-medium text-gray-700 mb-2">

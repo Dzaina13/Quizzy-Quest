@@ -25,7 +25,7 @@
               <div class="flex items-center gap-4">
                   <div class="text-right">
                       <p class="text-sm text-gray-600">Selamat datang,</p>
-                      <p class="font-semibold text-gray-900"><?= htmlspecialchars($_SESSION['username']) ?></p>
+                      <p class="font-semibold text-gray-900"><?= htmlspecialchars($_SESSION['user_name']) ?></p>
                   </div>
                   <a href="../logout.php" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200 flex items-center">
                       <i class="fas fa-sign-out-alt mr-2"></i>

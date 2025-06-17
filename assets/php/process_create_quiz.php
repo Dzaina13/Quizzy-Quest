@@ -118,13 +118,13 @@ function insertNormalQuestions($koneksi, $quiz_id, $questions) {
         foreach ($questions as $index => $question) {
             echo "<p>Processing normal question $index:</p>";
             
-            $question_text = trim($question['question_text'] ?? '');
+            $question_text = trim($question['text'] ?? '');
             $option_a = trim($question['option_a'] ?? '');
             $option_b = trim($question['option_b'] ?? '');
             $option_c = trim($question['option_c'] ?? '');
             $option_d = trim($question['option_d'] ?? '');
             $correct_answer = $question['correct_answer'] ?? '';
-            $explanation = trim($question['explanation'] ?? '');
+            $explanation = trim($question['explanation'] ?? 'no expla');
             
             echo "<pre>";
             echo "Question Text: '$question_text'\n";
@@ -137,7 +137,7 @@ function insertNormalQuestions($koneksi, $quiz_id, $questions) {
             echo "</pre>";
             
             if (!empty($question_text) && !empty($option_a) && !empty($option_b)) {
-                $question_stmt->bind_param("isssssss", $quiz_id, $question_text, $option_a, $option_b, $option_c, $option_d, $correct_answer, $explanation);
+                $question_stmt->bind_param('isssssss', $quiz_id, $question_text, $option_a, $option_b, $option_c, $option_d, $correct_answer, $explanation);
                 
                 if ($question_stmt->execute()) {
                     $question_count++;
@@ -162,7 +162,7 @@ function insertROFQuestions($koneksi, $quiz_id, $questions, $created_by) {
     echo "<p>✅ Inserting ROF Questions...</p>";
     
     // ROF questions masuk ke table rof_questions
-    $rof_sql = "INSERT INTO rof_questions (rof_session_id, question_text, correct_answer, created_by) VALUES (?, ?, ?, ?)";
+    $rof_sql = "INSERT INTO rof_questions (rof_quiz_id, question_text, correct_answer, created_by) VALUES (?, ?, ?, ?)";
     $rof_stmt = $koneksi->prepare($rof_sql);
     
     if ($rof_stmt) {
@@ -170,7 +170,7 @@ function insertROFQuestions($koneksi, $quiz_id, $questions, $created_by) {
         foreach ($questions as $index => $question) {
             echo "<p>Processing ROF question $index:</p>";
             
-            $question_text = trim($question['question_text'] ?? '');
+            $question_text = trim($question['text'] ?? '');
             $correct_answer = $question['correct_answer'] ?? '';
             
             echo "<pre>";
@@ -180,7 +180,7 @@ function insertROFQuestions($koneksi, $quiz_id, $questions, $created_by) {
             
             if (!empty($question_text) && !empty($correct_answer)) {
                 // Pastikan correct_answer adalah T atau F
-                if ($correct_answer === 'T' || $correct_answer === 'F') {
+                if ($correct_answer === 'true' || $correct_answer === 'false') {
                     $rof_stmt->bind_param("issi", $quiz_id, $question_text, $correct_answer, $created_by);
                     
                     if ($rof_stmt->execute()) {
@@ -210,7 +210,7 @@ function insertDecisionMakerQuestions($koneksi, $quiz_id, $questions, $created_b
     
     // Decision Maker questions masuk ke table decision_maker_questions
     // Sesuaikan dengan struktur table yang ada
-    $dm_sql = "INSERT INTO decision_maker_questions (quiz_id, question_text, guidance, created_by) VALUES (?, ?, ?, ?)";
+    $dm_sql = "INSERT INTO decision_maker_questions (quiz_id, question_text, correct_answer, created_by) VALUES (?, ?, ?, ?)";
     $dm_stmt = $koneksi->prepare($dm_sql);
     
     if ($dm_stmt) {
@@ -218,8 +218,8 @@ function insertDecisionMakerQuestions($koneksi, $quiz_id, $questions, $created_b
         foreach ($questions as $index => $question) {
             echo "<p>Processing Decision Maker question $index:</p>";
             
-            $question_text = trim($question['question_text'] ?? '');
-            $guidance = trim($question['explanation'] ?? ''); // explanation jadi guidance
+            $question_text = trim($question['text'] ?? '');
+            $guidance = trim($question['guide'] ?? ''); // explanation jadi guidance
             
             echo "<pre>";
             echo "DM Question Text: '$question_text'\n";

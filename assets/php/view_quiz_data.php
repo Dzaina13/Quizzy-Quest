@@ -36,24 +36,34 @@ class ViewQuizData {
       
       // Main query
       $query = "
-          SELECT 
-              q.quiz_id,
-              q.title,
-              q.description,
-              q.quiz_type,
-              q.created_at,
-              u.username as creator,
-              COUNT(DISTINCT qs.session_id) as total_sessions,
-              COUNT(DISTINCT p.participant_id) as total_participants,
-              COUNT(DISTINCT questions.question_id) as total_questions
-          FROM quizzes q
-          LEFT JOIN users u ON q.created_by = u.user_id
-          LEFT JOIN quiz_sessions qs ON q.quiz_id = qs.quiz_id
-          LEFT JOIN participants p ON qs.session_id = p.session_id
-          LEFT JOIN questions ON q.quiz_id = questions.quiz_id
-          $where_clause
-          GROUP BY q.quiz_id, q.title, q.description, q.quiz_type, q.created_at, u.username
-          ORDER BY q.created_at DESC
+         SELECT 
+            q.quiz_id,
+            q.title,
+            q.description,
+            q.quiz_type,
+            q.created_at,
+            u.username as creator,
+            COUNT(DISTINCT qs.session_id) as total_sessions,
+            COUNT(DISTINCT p.participant_id) as total_participants,
+            CASE 
+                WHEN q.quiz_type = 'rof' THEN (
+                    SELECT COUNT(*) FROM rof_questions rq WHERE rq.rof_quiz_id = q.quiz_id
+                )
+                WHEN q.quiz_type = 'decision_maker' THEN (
+                    SELECT COUNT(*) FROM decision_maker_questions dq WHERE dq.quiz_id = q.quiz_id
+                )
+                ELSE (
+                    SELECT COUNT(*) FROM questions qq WHERE qq.quiz_id = q.quiz_id
+                )
+            END as total_questions
+        FROM quizzes q
+        LEFT JOIN users u ON q.created_by = u.user_id
+        LEFT JOIN quiz_sessions qs ON q.quiz_id = qs.quiz_id
+        LEFT JOIN participants p ON qs.session_id = p.session_id
+        $where_clause
+        GROUP BY q.quiz_id, q.title, q.description, q.quiz_type, q.created_at, u.username
+        ORDER BY q.created_at DESC
+
       ";
       
       $result = mysqli_query($this->koneksi, $query);
@@ -104,6 +114,18 @@ class ViewQuizData {
    */
   public function hasQuestions($quiz_id) {
       $stmt = mysqli_prepare($this->koneksi, "SELECT COUNT(*) as count FROM questions WHERE quiz_id = ?");
+      mysqli_stmt_bind_param($stmt, "i", $quiz_id);
+      mysqli_stmt_execute($stmt);
+      $result = mysqli_stmt_get_result($stmt);
+      $row = mysqli_fetch_assoc($result);   
+
+      $stmt = mysqli_prepare($this->koneksi, "SELECT COUNT(*) as count FROM rof_questions WHERE rof_quiz_id = ?");
+      mysqli_stmt_bind_param($stmt, "i", $quiz_id);
+      mysqli_stmt_execute($stmt);
+      $result = mysqli_stmt_get_result($stmt);
+      $row = mysqli_fetch_assoc($result);
+
+       $stmt = mysqli_prepare($this->koneksi, "SELECT COUNT(*) as count FROM decision_maker_questions WHERE quiz_id = ?");
       mysqli_stmt_bind_param($stmt, "i", $quiz_id);
       mysqli_stmt_execute($stmt);
       $result = mysqli_stmt_get_result($stmt);

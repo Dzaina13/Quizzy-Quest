@@ -31,7 +31,7 @@ $sitemap_links = [
   ['url' => 'index.php', 'title' => 'Beranda'],
   ['url' => 'pages/login.php', 'title' => 'Login'],
   ['url' => 'pages/register.php', 'title' => 'Register'],
-  ['url' => 'pages/lobby.php', 'title' => 'Lobby Quiz']
+  ['url' => 'pages/login.php', 'title' => 'Lobby Quiz']
 ];
 
 // Informasi kontak
@@ -73,7 +73,7 @@ function generateHTML($page_title, $current_year, $carousel_images, $features, $
       <section class="join-quiz-section">
           <h2 class="section-title">Gabung Sekarang!</h2>
           <p class="section-description">Mulai petualangan kuismu hari ini.</p>
-          <a href="pages/pre-lobby.php" class="join-quiz-button">Masuk ke Lobby Quiz</a>
+          <a href="pages/login.php" class="join-quiz-button">Masuk ke Lobby Quiz</a>
       </section>
 
       <!-- Carousel Section -->

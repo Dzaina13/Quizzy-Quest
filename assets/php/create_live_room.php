@@ -23,11 +23,22 @@ $user_id = $_SESSION['user_id'];
 try {
   // ✅ TAMBAHAN: Validasi quiz dan pertanyaan
   $stmt_check = mysqli_prepare($koneksi, "
-      SELECT q.quiz_id, COUNT(questions.question_id) as question_count 
-      FROM quizzes q 
-      LEFT JOIN questions ON q.quiz_id = questions.quiz_id 
-      WHERE q.quiz_id = ? 
-      GROUP BY q.quiz_id
+      SELECT 
+    q.quiz_id,
+    q.quiz_type,
+    CASE 
+        WHEN q.quiz_type = 'rof' THEN (
+            SELECT COUNT(*) FROM rof_questions rq WHERE rq.rof_quiz_id = q.quiz_id
+        )
+        WHEN q.quiz_type = 'decision_maker' THEN (
+            SELECT COUNT(*) FROM decision_maker_questions dq WHERE dq.quiz_id = q.quiz_id
+        )
+        ELSE (
+            SELECT COUNT(*) FROM questions qq WHERE qq.quiz_id = q.quiz_id
+        )
+    END AS question_count
+FROM quizzes q
+WHERE q.quiz_id = ?
   ");
   mysqli_stmt_bind_param($stmt_check, "i", $quiz_id);
   mysqli_stmt_execute($stmt_check);
