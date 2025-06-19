@@ -13,7 +13,26 @@ if ($userInfo['role'] !== 'admin') {
 }
 
 $userHandler = new UserHandler($koneksi);
+
+// Get user statistics
 $stats = $userHandler->getUserStats();
+
+// Get recent users (simplified)
+try {
+    $recentUsers = $userHandler->getAllUsers('', '', '', 5, 0);
+} catch (Exception $e) {
+    error_log("Get recent users error: " . $e->getMessage());
+    $recentUsers = [];
+}
+
+// Get recent activities
+try {
+    $recentActivities = $userHandler->getUserActivityLogs(null, 20);
+} catch (Exception $e) {
+    error_log("Get recent activities error: " . $e->getMessage());
+    $recentActivities = [];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -108,110 +127,117 @@ $stats = $userHandler->getUserStats();
                             <!-- Search -->
                             <div class="relative flex-1 max-w-md">
                                 <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                <input type="text" id="searchUsers" placeholder="Cari pengguna..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                                <input type="text" id="searchInput" placeholder="Cari pengguna..." 
+                                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500">
                             </div>
                             
-                            <!-- Status Filter -->
-                            <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                            <!-- Filters -->
+                            <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500">
                                 <option value="">Semua Status</option>
                                 <option value="active">Aktif</option>
-                                <option value="inactive">Nonaktif</option>
-                                <option value="suspended">Suspended</option>
+                                <option value="inactive">Tidak Aktif</option>
                             </select>
                             
-                            <!-- Role Filter -->
-                            <select id="roleFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                            <select id="roleFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500">
                                 <option value="">Semua Role</option>
                                 <option value="user">User</option>
-                                <option value="premium">Premium</option>
                                 <option value="admin">Admin</option>
                             </select>
                         </div>
                         
-                        <!-- Action Buttons -->
-                        <div class="flex space-x-3">
-                            <button onclick="exportUsers()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all flex items-center">
+                        <div class="flex gap-3">
+                            <button onclick="exportUsers()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all">
                                 <i class="fas fa-download mr-2"></i>Export
                             </button>
-                            <button onclick="openAddUserModal()" class="bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end text-white px-6 py-2 rounded-lg hover:opacity-90 transition-all flex items-center">
-                                <i class="fas fa-user-plus mr-2"></i>Tambah Pengguna
+                            <button onclick="showAddUserModal()" class="bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all">
+                                <i class="fas fa-plus mr-2"></i>Tambah Pengguna
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- User Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                     <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-500 text-sm">Total Pengguna</p>
-                                <p class="text-3xl font-bold text-gray-800" id="totalUsers"><?php echo number_format($stats['total']); ?></p>
-                            </div>
-                            <div class="bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end p-3 rounded-full">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end rounded-lg flex items-center justify-center">
                                 <i class="fas fa-users text-white text-xl"></i>
                             </div>
-                        </div>
-                        <div class="mt-4">
-                            <span class="text-green-500 text-sm">+8% dari bulan lalu</span>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Total Pengguna</p>
+                                <p class="text-2xl font-bold text-gray-900"><?php echo $stats['total_users'] ?? 0; ?></p>
+                                <p class="text-xs text-green-600">Terdaftar</p>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-500 text-sm">Pengguna Aktif</p>
-                                <p class="text-3xl font-bold text-green-600" id="activeUsers"><?php echo number_format($stats['active']); ?></p>
-                            </div>
-                            <div class="bg-green-500 p-3 rounded-full">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
                                 <i class="fas fa-user-check text-white text-xl"></i>
                             </div>
-                        </div>
-                        <div class="mt-4">
-                            <span class="text-green-500 text-sm">+12% dari bulan lalu</span>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">User Reguler</p>
+                                <p class="text-2xl font-bold text-gray-900"><?php echo $stats['total_regular_users'] ?? 0; ?></p>
+                                <p class="text-xs text-green-600">Pengguna biasa</p>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-500 text-sm">Admin Users</p>
-                                <p class="text-3xl font-bold text-yellow-600" id="premiumUsers"><?php echo number_format($stats['premium']); ?></p>
-                            </div>
-                            <div class="bg-yellow-500 p-3 rounded-full">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center">
                                 <i class="fas fa-crown text-white text-xl"></i>
                             </div>
-                        </div>
-                        <div class="mt-4">
-                            <span class="text-green-500 text-sm">+25% dari bulan lalu</span>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Admin</p>
+                                <p class="text-2xl font-bold text-gray-900"><?php echo $stats['total_admins'] ?? 0; ?></p>
+                                <p class="text-xs text-green-600">Administrator</p>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-500 text-sm">Registrasi Hari Ini</p>
-                                <p class="text-3xl font-bold text-blue-600" id="todayUsers"><?php echo number_format($stats['today']); ?></p>
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-sign-in-alt text-white text-xl"></i>
                             </div>
-                            <div class="bg-blue-500 p-3 rounded-full">
-                                <i class="fas fa-user-plus text-white text-xl"></i>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Login 24 Jam</p>
+                                <p class="text-2xl font-bold text-gray-900"><?php echo $stats['recent_logins'] ?? 0; ?></p>
+                                <p class="text-xs text-green-600">Aktivitas terbaru</p>
                             </div>
                         </div>
-                        <div class="mt-4">
-                            <span class="text-green-500 text-sm">+15% dari kemarin</span>
+                    </div>
+                </div>
+
+                <!-- Login Activity Log Button -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Aktivitas Login/Logout</h3>
+                            <p class="text-gray-600 text-sm">Lihat log lengkap aktivitas pengguna</p>
                         </div>
+                        <button onclick="showActivityLogModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
+                            <i class="fas fa-history mr-2"></i>Lihat Log Aktivitas
+                        </button>
                     </div>
                 </div>
 
                 <!-- Users Table -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                     <div class="p-6 border-b border-gray-200">
                         <div class="flex justify-between items-center">
-                            <h3 class="text-lg font-semibold text-gray-800">Daftar Pengguna</h3>
-                            <div class="flex items-center space-x-2">
-                                <button onclick="selectAllUsers()" class="text-sm text-pink-600 hover:text-pink-800">Pilih Semua</button>
-                                <span class="text-gray-300">|</span>
-                                <button onclick="showBulkActionModal()" class="text-sm text-red-600 hover:text-red-800">Aksi Massal</button>
+                            <h3 class="text-lg font-semibold text-gray-900">Daftar Pengguna</h3>
+                            <div class="flex items-center space-x-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="selectAll" class="mr-2 rounded border-gray-300 text-pink-600 focus:ring-pink-500">
+                                    <span class="text-sm text-gray-600">Pilih Semua</span>
+                                </label>
+                                <select id="bulkAction" class="px-3 py-1 border border-gray-300 rounded text-sm">
+                                    <option value="">Aksi Massal</option>
+                                    <option value="delete">Hapus Terpilih</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -220,295 +246,461 @@ $stats = $userHandler->getUserStats();
                         <table class="w-full">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-pink-600 focus:ring-pink-500">
-                                    </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pengguna</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aktivitas</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Login Terakhir</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bergabung</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200" id="usersTableBody">
-                                <!-- Data will be loaded via AJAX -->
+                            <tbody id="usersTableBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Data akan dimuat via AJAX -->
                             </tbody>
                         </table>
                     </div>
                     
                     <!-- Pagination -->
-                    <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6" id="paginationContainer">
-                        <!-- Pagination will be loaded via AJAX -->
+                    <div class="px-6 py-3 border-t border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-gray-700">
+                                Menampilkan <span id="showingStart">1</span> sampai <span id="showingEnd">10</span> dari <span id="totalUsers">0</span> pengguna
+                            </div>
+                            <div class="flex space-x-2" id="paginationContainer">
+                                <!-- Pagination buttons akan dimuat via JavaScript -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>
         </div>
     </div>
 
-    <!-- Modal Tambah Pengguna -->
-    <div id="addUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+    <!-- Modal Activity Log -->
+    <div id="activityLogModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+        <div class="relative top-10 mx-auto p-5 border w-11/12 max-w-6xl shadow-lg rounded-md bg-white">
             <div class="mt-3">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Tambah Pengguna Baru</h3>
-                    <button onclick="closeAddUserModal()" class="text-gray-400 hover:text-gray-600">
+                    <h3 class="text-lg font-medium text-gray-900">Log Aktivitas Login/Logout</h3>
+                    <button onclick="closeActivityLogModal()" class="text-gray-400 hover:text-gray-600">
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
                 
-                <form id="addUserForm" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Username *</label>
-                            <input type="text" name="username" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500" placeholder="Masukkan username">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                            <input type="email" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500" placeholder="user@email.com">
-                        </div>
+                <!-- Filter untuk modal -->
+                <div class="flex flex-wrap gap-4 mb-4">
+                    <input type="text" id="activitySearch" placeholder="Cari aktivitas..." 
+                           class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-pink-500 focus:border-pink-500">
+                    <select id="activityFilter" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-pink-500 focus:border-pink-500">
+                        <option value="">Semua Aktivitas</option>
+                        <option value="login">Login</option>
+                        <option value="logout">Logout</option>
+                    </select>
+                    <button onclick="exportActivityLog()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-sm">
+                        <i class="fas fa-download mr-2"></i>Export CSV
+                    </button>
+                </div>
+                
+                <div id="activityLogContent" class="max-h-96 overflow-y-auto">
+                    <div class="text-center py-8">
+                        <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+                        <p class="text-gray-500 mt-2">Memuat data...</p>
                     </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
-                            <input type="password" name="password" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500" placeholder="Masukkan password">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password *</label>
-                            <input type="password" name="confirm_password" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500" placeholder="Konfirmasi password">
-                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Add/Edit User -->
+    <div id="userModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900 mb-4" id="modalTitle">Tambah Pengguna Baru</h3>
+                <form id="userForm">
+                    <input type="hidden" id="userId" name="userId">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                        <input type="text" id="username" name="username" required 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
                     </div>
-                    
-                    <div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="email" name="email" required 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <div class="mb-4" id="passwordField">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="password" name="password" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                        <select name="role" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500">
+                        <select id="role" name="role" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
                         </select>
                     </div>
-                    
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <button type="button" onclick="closeAddUserModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeUserModal()" 
+                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
                             Batal
                         </button>
-                        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end text-white rounded-md text-sm font-medium hover:opacity-90">
-                            Tambah Pengguna
+                        <button type="submit" 
+                                class="px-4 py-2 bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end text-white rounded-md hover:opacity-90">
+                            Simpan
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Edit Pengguna -->
-    <div id="editUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Edit Pengguna</h3>
-                    <button onclick="closeEditUserModal()" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                
-                <form id="editUserForm" class="space-y-4">
-                    <input type="hidden" name="user_id" id="editUserId">
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Username *</label>
-                            <input type="text" name="username" id="editUsername" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                            <input type="email" name="email" id="editEmail" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                        <select name="role" id="editRole" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500">
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <button type="button" onclick="closeEditUserModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                            Batal
-                        </button>
-                        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end text-white rounded-md text-sm font-medium hover:opacity-90">
-                            Update Pengguna
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Detail Pengguna -->
-    <div id="userDetailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-10 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-2/3 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-medium text-gray-900">Detail Pengguna</h3>
-                    <button onclick="closeUserDetailModal()" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                
-                <div id="userDetailContent">
-                    <!-- Content will be loaded via AJAX -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Kirim Pesan -->
-    <div id="messageModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Kirim Pesan</h3>
-                    <button onclick="closeMessageModal()" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                
-                <form id="messageForm" class="space-y-4">
-                    <input type="hidden" name="user_id" id="messageUserId">
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Kepada</label>
-                        <input type="text" id="messageUserName" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Subjek</label>
-                        <input type="text" name="subject" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500" placeholder="Masukkan subjek pesan">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Pesan</label>
-                        <textarea name="message" rows="5" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500" placeholder="Tulis pesan Anda..."></textarea>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <button type="button" onclick="closeMessageModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                            Batal
-                        </button>
-                        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end text-white rounded-md text-sm font-medium hover:opacity-90">
-                            <i class="fas fa-paper-plane mr-2"></i>Kirim Pesan
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Bulk Action -->
-    <div id="bulkActionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-1/3 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Aksi Massal</h3>
-                    <button onclick="closeBulkActionModal()" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                
-                <div class="space-y-4">
-                    <p class="text-gray-600">Pilih aksi untuk <span id="selectedCount">0</span> pengguna yang dipilih:</p>
-                    
-                    <div class="space-y-2">
-                        <button onclick="bulkAction('activate')" class="w-full text-left px-4 py-3 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 text-green-700">
-                            <i class="fas fa-check-circle mr-3"></i>Aktifkan Pengguna
-                        </button>
-                        <button onclick="bulkAction('suspend')" class="w-full text-left px-4 py-3 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 text-yellow-700">
-                            <i class="fas fa-ban mr-3"></i>Suspend Pengguna
-                        </button>
-                        <button onclick="bulkAction('delete')" class="w-full text-left px-4 py-3 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 text-red-700">
-                            <i class="fas fa-trash mr-3"></i>Hapus Pengguna
-                        </button>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-3 pt-4 border-t">
-                        <button onclick="closeBulkActionModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                            Batal
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
     <script>
         let currentPage = 1;
-        let currentSearch = '';
-        let currentStatusFilter = '';
-        let currentRoleFilter = '';
+        let totalPages = 1;
+        let isLoading = false;
 
-        // Initialize page
+        // Load users on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadUsers();
-            setupEventListeners();
+            
+            // Event listeners
+            document.getElementById('searchInput').addEventListener('input', debounce(loadUsers, 300));
+            document.getElementById('statusFilter').addEventListener('change', loadUsers);
+            document.getElementById('roleFilter').addEventListener('change', loadUsers);
+            document.getElementById('selectAll').addEventListener('change', toggleSelectAll);
+            document.getElementById('bulkAction').addEventListener('change', handleBulkAction);
+            document.getElementById('userForm').addEventListener('submit', handleUserSubmit);
+            document.getElementById('activitySearch').addEventListener('input', debounce(filterActivityLog, 300));
+            document.getElementById('activityFilter').addEventListener('change', filterActivityLog);
         });
 
-        function setupEventListeners() {
-            // Search functionality
-            document.getElementById('searchUsers').addEventListener('input', function(e) {
-                currentSearch = e.target.value;
-                currentPage = 1;
-                loadUsers();
-            });
-
-            // Filter functionality
-            document.getElementById('statusFilter').addEventListener('change', function(e) {
-                currentStatusFilter = e.target.value;
-                currentPage = 1;
-                loadUsers();
-            });
-
-            document.getElementById('roleFilter').addEventListener('change', function(e) {
-                currentRoleFilter = e.target.value;
-                currentPage = 1;
-                loadUsers();
-            });
-
-            // Select all functionality
-            document.getElementById('selectAll').addEventListener('change', function() {
-                const checkboxes = document.querySelectorAll('.user-checkbox');
-                checkboxes.forEach(checkbox => {
-                    checkbox.checked = this.checked;
-                });
-                updateSelectedCount();
-            });
-
-            // Form submissions
-            document.getElementById('addUserForm').addEventListener('submit', handleAddUser);
-            document.getElementById('editUserForm').addEventListener('submit', handleEditUser);
-            document.getElementById('messageForm').addEventListener('submit', handleSendMessage);
-        }
-
-        function loadUsers() {
+        function loadUsers(page = 1) {
+            if (isLoading) return;
+            isLoading = true;
+            
+            const search = document.getElementById('searchInput').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const roleFilter = document.getElementById('roleFilter').value;
+            
             const params = new URLSearchParams({
                 ajax: '1',
-                page: currentPage,
-                search: currentSearch,
-                status_filter: currentStatusFilter,
-                role_filter: currentRoleFilter
+                page: page,
+                search: search,
+                status_filter: statusFilter,
+                role_filter: roleFilter
             });
-
+            
             fetch(`../../assets/php/user_actions.php?${params}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         displayUsers(data.users);
-                                               displayPagination(data.page, data.total_pages, data.total);
+                        updatePagination(data.pagination);
+                        currentPage = page;
                     } else {
-                        showAlert('error', data.message);
+                        showAlert('error', data.message || 'Gagal memuat data pengguna');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('error', 'Terjadi kesalahan saat memuat data');
+                })
+                .finally(() => {
+                    isLoading = false;
+                });
+        }
+
+        function displayUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            
+            if (users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                            <i class="fas fa-users text-4xl mb-4 opacity-50"></i>
+                            <p>Tidak ada pengguna ditemukan</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <input type="checkbox" class="user-checkbox mr-3" value="${user.user_id}">
+                            <div class="w-10 h-10 bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end rounded-full flex items-center justify-center">
+                                <span class="text-white font-semibold">${user.username.charAt(0).toUpperCase()}</span>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${escapeHtml(user.username)}</div>
+                                <div class="text-sm text-gray-500">ID: #${user.user_id.toString().padStart(3, '0')}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${escapeHtml(user.email)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColorClass(user.role)}">
+                            ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${user.status === 'Online' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                            <div class="w-2 h-2 ${user.status === 'Online' ? 'bg-green-400' : 'bg-gray-400'} rounded-full mr-1"></div>
+                            ${user.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${user.last_login && user.last_login !== 'Never' ? formatDate(user.last_login) : 'Belum pernah login'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${formatDate(user.created_at)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="editUser(${user.user_id})" class="text-green-600 hover:text-green-900 mr-3" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteUser(${user.user_id})" class="text-red-600 hover:text-red-900" title="Hapus">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updatePagination(pagination) {
+            totalPages = pagination.total_pages;
+            document.getElementById('showingStart').textContent = pagination.showing_start;
+            document.getElementById('showingEnd').textContent = pagination.showing_end;
+            document.getElementById('totalUsers').textContent = pagination.total_users;
+            
+            const container = document.getElementById('paginationContainer');
+            container.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            // Previous button
+            if (currentPage > 1) {
+                const prevBtn = createPaginationButton(currentPage - 1, '‹ Sebelumnya');
+                container.appendChild(prevBtn);
+            }
+            
+            // Page numbers
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const btn = createPaginationButton(i, i.toString(), i === currentPage);
+                container.appendChild(btn);
+            }
+            
+            // Next button
+            if (currentPage < totalPages) {
+                const nextBtn = createPaginationButton(currentPage + 1, 'Selanjutnya ›');
+                container.appendChild(nextBtn);
+            }
+        }
+
+        function createPaginationButton(page, text, isActive = false) {
+            const button = document.createElement('button');
+            button.textContent = text;
+            button.className = `px-3 py-1 text-sm border rounded ${isActive ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`;
+            button.onclick = () => loadUsers(page);
+            return button;
+        }
+
+        // Activity Log Modal Functions
+        function showActivityLogModal() {
+            document.getElementById('activityLogModal').classList.remove('hidden');
+            loadActivityLog();
+        }
+
+        function closeActivityLogModal() {
+            document.getElementById('activityLogModal').classList.add('hidden');
+        }
+
+        function loadActivityLog() {
+            const content = document.getElementById('activityLogContent');
+            content.innerHTML = `
+                <div class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+                    <p class="text-gray-500 mt-2">Memuat data...</p>
+                </div>
+            `;
+            
+            const search = document.getElementById('activitySearch').value;
+                      const filter = document.getElementById('activityFilter').value;
+            
+            const params = new URLSearchParams({
+                ajax: '1',
+                action: 'get_activity_log',
+                search: search,
+                filter: filter,
+                limit: 100
+            });
+            
+            fetch(`../../assets/php/user_actions.php?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayActivityLog(data.activities);
+                    } else {
+                        content.innerHTML = `
+                            <div class="text-center py-8">
+                                <i class="fas fa-exclamation-triangle text-2xl text-red-400"></i>
+                                <p class="text-red-500 mt-2">${data.message || 'Gagal memuat log aktivitas'}</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    content.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-exclamation-triangle text-2xl text-red-400"></i>
+                            <p class="text-red-500 mt-2">Terjadi kesalahan saat memuat data</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function displayActivityLog(activities) {
+            const content = document.getElementById('activityLogContent');
+            
+            if (activities.length === 0) {
+                content.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-history text-4xl text-gray-300"></i>
+                        <p class="text-gray-500 mt-2">Tidak ada aktivitas ditemukan</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-medium text-gray-600">Waktu</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-600">Pengguna</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-600">Aktivitas</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-600">IP Address</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-600">Device</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+            `;
+            
+            activities.forEach(activity => {
+                const activityIcon = activity.activity_type === 'login' ? 
+                    '<i class="fas fa-sign-in-alt text-green-500"></i>' : 
+                    '<i class="fas fa-sign-out-alt text-red-500"></i>';
+                
+                const activityColor = activity.activity_type === 'login' ? 
+                    'bg-green-100 text-green-800' : 
+                    'bg-red-100 text-red-800';
+                
+                html += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <div class="text-sm font-medium text-gray-900">${formatDateTime(activity.created_at)}</div>
+                            <div class="text-xs text-gray-500">${formatTimeAgo(activity.created_at)}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end rounded-full flex items-center justify-center">
+                                    <span class="text-white text-xs font-semibold">${activity.username ? activity.username.charAt(0).toUpperCase() : 'U'}</span>
+                                </div>
+                                <div class="ml-3">
+                                    <div class="text-sm font-medium text-gray-900">${escapeHtml(activity.username || 'Unknown')}</div>
+                                    <div class="text-xs text-gray-500">${escapeHtml(activity.email || '')}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${activityColor}">
+                                ${activityIcon}
+                                <span class="ml-1">${activity.activity_type.charAt(0).toUpperCase() + activity.activity_type.slice(1)}</span>
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-900">
+                            ${activity.ip_address || 'Unknown'}
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-500">
+                            ${parseUserAgent(activity.user_agent)}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            content.innerHTML = html;
+        }
+
+        function filterActivityLog() {
+            loadActivityLog();
+        }
+
+        function exportActivityLog() {
+            const search = document.getElementById('activitySearch').value;
+            const filter = document.getElementById('activityFilter').value;
+            
+            const params = new URLSearchParams({
+                action: 'export_activity_log',
+                search: search,
+                filter: filter
+            });
+            
+            window.open(`../../assets/php/user_actions.php?${params}`, '_blank');
+        }
+
+        // User Modal Functions
+        function showAddUserModal() {
+            document.getElementById('modalTitle').textContent = 'Tambah Pengguna Baru';
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('passwordField').style.display = 'block';
+            document.getElementById('password').required = true;
+            document.getElementById('userModal').classList.remove('hidden');
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.add('hidden');
+        }
+
+        function editUser(userId) {
+            document.getElementById('modalTitle').textContent = 'Edit Pengguna';
+            document.getElementById('userId').value = userId;
+            document.getElementById('passwordField').style.display = 'none';
+            document.getElementById('password').required = false;
+            
+            // Load user data
+            fetch(`../../assets/php/user_actions.php?ajax=1&action=get_user&id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('username').value = data.user.username;
+                        document.getElementById('email').value = data.user.email;
+                        document.getElementById('role').value = data.user.role;
+                        document.getElementById('userModal').classList.remove('hidden');
+                    } else {
+                        showAlert('error', data.message || 'Gagal memuat data pengguna');
                     }
                 })
                 .catch(error => {
@@ -517,212 +709,14 @@ $stats = $userHandler->getUserStats();
                 });
         }
 
-        function displayUsers(users) {
-            const tbody = document.getElementById('usersTableBody');
-            tbody.innerHTML = '';
-
-            if (users.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="text-center py-8 text-gray-500">
-                            <i class="fas fa-users text-4xl mb-4 text-gray-300"></i>
-                            <p>Tidak ada data pengguna ditemukan</p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            users.forEach(user => {
-                const row = createUserRow(user);
-                tbody.appendChild(row);
-            });
-
-            // Reset select all checkbox
-            document.getElementById('selectAll').checked = false;
-            updateSelectedCount();
-        }
-
-        function createUserRow(user) {
-            const row = document.createElement('tr');
-            row.className = 'hover:bg-gray-50 transition-colors';
+        function handleUserSubmit(e) {
+            e.preventDefault();
             
-            // Ensure all fields have default values based on actual database structure
-            const username = user.username || 'Unknown';
-            const email = user.email || '';
-            const role = user.role || 'participant';
-            const createdAt = user.created_at || '';
-            const userId = user.user_id || 0;
+            const formData = new FormData(e.target);
+            const userId = formData.get('userId');
+            const action = userId ? 'update_user' : 'add_user';
+            formData.append('action', action);
             
-            const initials = getInitials(username);
-            const roleColor = getRoleColor(role);
-            
-            // Since we don't have status in database, simulate it as active
-            const status = 'active';
-            const statusColor = getStatusColor(status);
-            
-            row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <input type="checkbox" class="user-checkbox rounded border-gray-300 text-pink-600 focus:ring-pink-500" value="${userId}" onchange="updateSelectedCount()">
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end rounded-full flex items-center justify-center">
-                            <span class="text-white font-semibold">${initials}</span>
-                        </div>
-                        <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">${escapeHtml(username)}</div>
-                            <div class="text-sm text-gray-500">ID: #${userId.toString().padStart(3, '0')}</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">${escapeHtml(email)}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-${roleColor}-100 text-${roleColor}-800">
-                        ${capitalizeFirst(role)}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-${statusColor}-100 text-${statusColor}-800">
-                        ${getStatusLabel(status)}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div class="text-xs">
-                        <div>Login terakhir: Belum diketahui</div>
-                        <div>Aktivitas: Normal</div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${formatDate(createdAt)}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div class="flex space-x-2">
-                        <button onclick="viewUser(${userId})" class="text-blue-600 hover:text-blue-900" title="Lihat Detail">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button onclick="editUser(${userId})" class="text-yellow-600 hover:text-yellow-900" title="Edit">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="sendMessage(${userId})" class="text-green-600 hover:text-green-900" title="Kirim Pesan">
-                            <i class="fas fa-envelope"></i>
-                        </button>
-                        <button onclick="deleteUser(${userId})" class="text-red-600 hover:text-red-900" title="Hapus">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            `;
-            
-            return row;
-        }
-
-        function displayPagination(page, totalPages, total) {
-            const container = document.getElementById('paginationContainer');
-            const start = (page - 1) * 10 + 1;
-            const end = Math.min(page * 10, total);
-            
-            container.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <div class="flex-1 flex justify-between sm:hidden">
-                        <button onclick="changePage(${page - 1})" ${page <= 1 ? 'disabled' : ''} 
-                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 ${page <= 1 ? 'opacity-50 cursor-not-allowed' : ''}">
-                            Previous
-                        </button>
-                        <button onclick="changePage(${page + 1})" ${page >= totalPages ? 'disabled' : ''} 
-                                class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 ${page >= totalPages ? 'opacity-50 cursor-not-allowed' : ''}">
-                            Next
-                        </button>
-                    </div>
-                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                        <div>
-                            <p class="text-sm text-gray-700">
-                                Menampilkan <span class="font-medium">${start}</span> sampai <span class="font-medium">${end}</span> dari <span class="font-medium">${total}</span> pengguna
-                            </p>
-                        </div>
-                        <div>
-                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                                <button onclick="changePage(${page - 1})" ${page <= 1 ? 'disabled' : ''} 
-                                        class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${page <= 1 ? 'opacity-50 cursor-not-allowed' : ''}">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                ${generatePageNumbers(page, totalPages)}
-                                <button onclick="changePage(${page + 1})" ${page >= totalPages ? 'disabled' : ''} 
-                                        class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${page >= totalPages ? 'opacity-50 cursor-not-allowed' : ''}">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function generatePageNumbers(currentPage, totalPages) {
-            let pages = '';
-            const maxVisible = 5;
-            let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-            let end = Math.min(totalPages, start + maxVisible - 1);
-            
-            if (end - start + 1 < maxVisible) {
-                start = Math.max(1, end - maxVisible + 1);
-            }
-            
-            for (let i = start; i <= end; i++) {
-                const isActive = i === currentPage;
-                pages += `
-                    <button onclick="changePage(${i})" 
-                            class="${isActive ? 'bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end border-pink-500 text-white' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'} relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                        ${i}
-                    </button>
-                `;
-            }
-            
-            return pages;
-        }
-
-        function changePage(page) {
-            if (page < 1) return;
-            currentPage = page;
-            loadUsers();
-        }
-
-        // Modal Functions
-        function openAddUserModal() {
-            document.getElementById('addUserModal').classList.remove('hidden');
-        }
-
-        function closeAddUserModal() {
-            document.getElementById('addUserModal').classList.add('hidden');
-            document.getElementById('addUserForm').reset();
-        }
-
-        function closeEditUserModal() {
-            document.getElementById('editUserModal').classList.add('hidden');
-            document.getElementById('editUserForm').reset();
-        }
-
-        function closeUserDetailModal() {
-            document.getElementById('userDetailModal').classList.add('hidden');
-        }
-
-        function closeMessageModal() {
-            document.getElementById('messageModal').classList.add('hidden');
-            document.getElementById('messageForm').reset();
-        }
-
-        function closeBulkActionModal() {
-            document.getElementById('bulkActionModal').classList.add('hidden');
-        }
-
-        // User Actions
-        function viewUser(userId) {
-            const formData = new FormData();
-            formData.append('action', 'get_user');
-            formData.append('user_id', userId);
-
             fetch('../../assets/php/user_actions.php', {
                 method: 'POST',
                 body: formData
@@ -730,183 +724,25 @@ $stats = $userHandler->getUserStats();
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    displayUserDetail(data.user);
-                    document.getElementById('userDetailModal').classList.remove('hidden');
+                    showAlert('success', data.message || 'Pengguna berhasil disimpan');
+                    closeUserModal();
+                    loadUsers(currentPage);
                 } else {
-                    showAlert('error', data.message);
+                    showAlert('error', data.message || 'Gagal menyimpan pengguna');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showAlert('error', 'Terjadi kesalahan saat memuat detail pengguna');
-            });
-        }
-
-        function displayUserDetail(user) {
-            const initials = getInitials(user.username);
-            const roleColor = getRoleColor(user.role);
-            
-            document.getElementById('userDetailContent').innerHTML = `
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- User Info -->
-                    <div class="lg:col-span-1">
-                        <div class="bg-gray-50 p-6 rounded-lg">
-                            <div class="text-center">
-                                <div class="w-20 h-20 bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <span class="text-white font-bold text-2xl">${initials}</span>
-                                </div>
-                                <h4 class="text-lg font-semibold text-gray-900">${escapeHtml(user.username)}</h4>
-                                <p class="text-gray-500 text-sm">ID: #${user.user_id.toString().padStart(3, '0')}</p>
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${roleColor}-100 text-${roleColor}-800 mt-2">
-                                    ${capitalizeFirst(user.role)}
-                                </span>
-                            </div>
-                            
-                            <div class="mt-6 space-y-3">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">Email:</span>
-                                    <span class="text-gray-900">${escapeHtml(user.email)}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">Status:</span>
-                                    <span class="text-green-600">Aktif</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">Bergabung:</span>
-                                    <span class="text-gray-900">${formatDate(user.created_at)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Stats & Activity -->
-                    <div class="lg:col-span-2">
-                        <div class="grid grid-cols-2 gap-4 mb-6">
-                            <div class="bg-blue-50 p-4 rounded-lg">
-                                <div class="flex items-center">
-                                    <i class="fas fa-question-circle text-blue-500 text-2xl mr-3"></i>
-                                    <div>
-                                        <p class="text-blue-600 text-sm">Quiz Dibuat</p>
-                                        <p class="text-2xl font-bold text-blue-700">0</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-green-50 p-4 rounded-lg">
-                                <div class="flex items-center">
-                                    <i class="fas fa-trophy text-green-500 text-2xl mr-3"></i>
-                                    <div>
-                                        <p class="text-green-600 text-sm">Quiz Dimainkan</p>
-                                        <p class="text-2xl font-bold text-green-700">0</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-yellow-50 p-4 rounded-lg">
-                                <div class="flex items-center">
-                                    <i class="fas fa-star text-yellow-500 text-2xl mr-3"></i>
-                                    <div>
-                                        <p class="text-yellow-600 text-sm">Rata-rata Skor</p>
-                                        <p class="text-2xl font-bold text-yellow-700">0%</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-purple-50 p-4 rounded-lg">
-                                <div class="flex items-center">
-                                    <i class="fas fa-clock text-purple-500 text-2xl mr-3"></i>
-                                    <div>
-                                        <p class="text-purple-600 text-sm">Login Terakhir</p>
-                                        <p class="text-sm font-bold text-purple-700">Belum diketahui</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Recent Activity -->
-                        <div class="bg-white border border-gray-200 rounded-lg p-4">
-                            <h5 class="font-semibold text-gray-900 mb-4">Aktivitas Terbaru</h5>
-                            <div class="space-y-3">
-                                <p class="text-gray-500 text-sm">Belum ada aktivitas yang tercatat</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-6">
-                    <button onclick="sendMessage(${user.user_id})" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700">
-                        <i class="fas fa-envelope mr-2"></i>Kirim Pesan
-                    </button>
-                    <button onclick="editUser(${user.user_id})" class="px-4 py-2 bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end text-white rounded-md text-sm font-medium hover:opacity-90">
-                        <i class="fas fa-edit mr-2"></i>Edit Pengguna
-                    </button>
-                </div>
-            `;
-        }
-
-        function editUser(userId) {
-            const formData = new FormData();
-            formData.append('action', 'get_user');
-            formData.append('user_id', userId);
-
-            fetch('../../assets/php/user_actions.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const user = data.user;
-                    document.getElementById('editUserId').value = user.user_id;
-                    document.getElementById('editUsername').value = user.username;
-                    document.getElementById('editEmail').value = user.email;
-                    document.getElementById('editRole').value = user.role;
-                    
-                    // Close detail modal if open
-                    closeUserDetailModal();
-                    document.getElementById('editUserModal').classList.remove('hidden');
-                } else {
-                    showAlert('error', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('error', 'Terjadi kesalahan saat memuat data pengguna');
-            });
-        }
-
-        function sendMessage(userId) {
-            const formData = new FormData();
-            formData.append('action', 'get_user');
-            formData.append('user_id', userId);
-
-            fetch('../../assets/php/user_actions.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const user = data.user;
-                    document.getElementById('messageUserId').value = user.user_id;
-                    document.getElementById('messageUserName').value = `${user.username} (${user.email})`;
-                    
-                    // Close detail modal if open
-                    closeUserDetailModal();
-                    document.getElementById('messageModal').classList.remove('hidden');
-                } else {
-                    showAlert('error', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('error', 'Terjadi kesalahan saat memuat data pengguna');
+                showAlert('error', 'Terjadi kesalahan saat menyimpan data');
             });
         }
 
         function deleteUser(userId) {
-            if (confirm('Apakah Anda yakin ingin menghapus pengguna ini? Aksi ini tidak dapat dibatalkan!')) {
+            if (confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
                 const formData = new FormData();
                 formData.append('action', 'delete_user');
-                formData.append('user_id', userId);
-
+                formData.append('userId', userId);
+                
                 fetch('../../assets/php/user_actions.php', {
                     method: 'POST',
                     body: formData
@@ -914,173 +750,47 @@ $stats = $userHandler->getUserStats();
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        showAlert('success', data.message);
-                        loadUsers();
-                        closeUserDetailModal();
+                        showAlert('success', data.message || 'Pengguna berhasil dihapus');
+                        loadUsers(currentPage);
                     } else {
-                        showAlert('error', data.message);
+                        showAlert('error', data.message || 'Gagal menghapus pengguna');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showAlert('error', 'Terjadi kesalahan saat menghapus pengguna');
+                    showAlert('error', 'Terjadi kesalahan saat menghapus data');
                 });
             }
-        }
-
-        // Form Handlers
-        function handleAddUser(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            
-            // Validate password confirmation
-            const password = formData.get('password');
-            const confirmPassword = formData.get('confirm_password');
-            
-            if (password !== confirmPassword) {
-                showAlert('error', 'Konfirmasi password tidak cocok');
-                return;
-            }
-            
-            formData.append('action', 'create_user');
-
-            fetch('../../assets/php/user_actions.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showAlert('success', data.message);
-                    closeAddUserModal();
-                    loadUsers();
-                } else {
-                    showAlert('error', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('error', 'Terjadi kesalahan saat membuat pengguna');
-            });
-        }
-
-        function handleEditUser(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            formData.append('action', 'update_user');
-
-            fetch('../../assets/php/user_actions.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showAlert('success', data.message);
-                    closeEditUserModal();
-                    loadUsers();
-                } else {
-                    showAlert('error', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('error', 'Terjadi kesalahan saat mengupdate pengguna');
-            });
-        }
-
-        function handleSendMessage(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            formData.append('action', 'send_message');
-
-            fetch('../../assets/php/user_actions.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showAlert('success', data.message);
-                    closeMessageModal();
-                } else {
-                    showAlert('error', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('error', 'Terjadi kesalahan saat mengirim pesan');
-            });
         }
 
         // Bulk Actions
-        function selectAllUsers() {
-            const selectAllCheckbox = document.getElementById('selectAll');
-            selectAllCheckbox.checked = !selectAllCheckbox.checked;
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.user-checkbox');
             
-            const userCheckboxes = document.querySelectorAll('.user-checkbox');
-            userCheckboxes.forEach(checkbox => {
-                checkbox.checked = selectAllCheckbox.checked;
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
             });
-            
-            updateSelectedCount();
         }
 
-        function updateSelectedCount() {
-            const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
-            const count = selectedCheckboxes.length;
+        function handleBulkAction() {
+            const action = document.getElementById('bulkAction').value;
+            if (!action) return;
             
-            const countElement = document.getElementById('selectedCount');
-            if (countElement) {
-                countElement.textContent = count;
-            }
-        }
-
-        function showBulkActionModal() {
-            const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
+            const selectedUsers = Array.from(document.querySelectorAll('.user-checkbox:checked'))
+                .map(checkbox => checkbox.value);
             
-            if (selectedCheckboxes.length === 0) {
-                showAlert('warning', 'Pilih minimal satu pengguna untuk melakukan aksi massal.');
+            if (selectedUsers.length === 0) {
+                showAlert('warning', 'Pilih minimal satu pengguna');
                 return;
             }
             
-            updateSelectedCount();
-            document.getElementById('bulkActionModal').classList.remove('hidden');
-        }
-
-        function bulkAction(action) {
-            const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
-            const userIds = Array.from(selectedCheckboxes).map(cb => cb.value);
-            
-            if (userIds.length === 0) {
-                showAlert('warning', 'Pilih minimal satu pengguna.');
-                return;
-            }
-            
-            let confirmMessage = '';
-            switch(action) {
-                case 'activate':
-                    confirmMessage = `Aktifkan ${userIds.length} pengguna yang dipilih?`;
-                    break;
-                case 'suspend':
-                    confirmMessage = `Suspend ${userIds.length} pengguna yang dipilih?`;
-                    break;
-                case 'delete':
-                    confirmMessage = `Hapus ${userIds.length} pengguna yang dipilih? Aksi ini tidak dapat dibatalkan!`;
-                    break;
-                default:
-                    return;
-            }
-            
-            if (confirm(confirmMessage)) {
+            if (confirm(`Apakah Anda yakin ingin ${action} ${selectedUsers.length} pengguna?`)) {
                 const formData = new FormData();
                 formData.append('action', 'bulk_action');
                 formData.append('bulk_action', action);
-                userIds.forEach(id => formData.append('user_ids[]', id));
-
+                formData.append('user_ids', JSON.stringify(selectedUsers));
+                
                 fetch('../../assets/php/user_actions.php', {
                     method: 'POST',
                     body: formData
@@ -1088,134 +798,34 @@ $stats = $userHandler->getUserStats();
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        showAlert('success', data.message);
-                        closeBulkActionModal();
-                        loadUsers();
+                        showAlert('success', data.message || 'Aksi berhasil dilakukan');
+                        loadUsers(currentPage);
+                        document.getElementById('selectAll').checked = false;
+                        document.getElementById('bulkAction').value = '';
                     } else {
-                        showAlert('error', data.message);
+                        showAlert('error', data.message || 'Gagal melakukan aksi');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showAlert('error', 'Terjadi kesalahan saat melakukan aksi massal');
+                    showAlert('error', 'Terjadi kesalahan saat melakukan aksi');
                 });
             }
         }
 
-        // Export Function
         function exportUsers() {
-            showAlert('info', 'Fitur export sedang dalam pengembangan');
-        }
-
-        // Utility Functions
-        function getInitials(name) {
-            if (!name) return 'U';
-            return name.split(' ').map(word => word.charAt(0).toUpperCase()).join('').substring(0, 2);
-        }
-
-        function getRoleColor(role) {
-            const colors = {
-                'participant': 'blue',
-                'admin': 'purple'
-            };
-            return colors[role] || 'gray';
-        }
-
-        function getStatusColor(status) {
-            const colors = {
-                'active': 'green',
-                'inactive': 'gray',
-                'suspended': 'red'
-            };
-            return colors[status] || 'green';
-        }
-
-        function getStatusLabel(status) {
-            const labels = {
-                'active': 'Aktif',
-                'inactive': 'Nonaktif',
-                'suspended': 'Suspended'
-            };
-            return labels[status] || 'Aktif';
-        }
-
-        function capitalizeFirst(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return 'Tidak diketahui';
-            const date = new Date(dateString);
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function showAlert(type, message) {
-            // Create alert element
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-md transition-all duration-300 transform translate-x-full`;
+            const search = document.getElementById('searchInput').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const roleFilter = document.getElementById('roleFilter').value;
             
-            let bgColor, textColor, icon;
-            switch(type) {
-                case 'success':
-                    bgColor = 'bg-green-500';
-                    textColor = 'text-white';
-                    icon = 'fa-check-circle';
-                    break;
-                case 'error':
-                    bgColor = 'bg-red-500';
-                    textColor = 'text-white';
-                    icon = 'fa-exclamation-circle';
-                    break;
-                case 'warning':
-                    bgColor = 'bg-yellow-500';
-                    textColor = 'text-white';
-                    icon = 'fa-exclamation-triangle';
-                    break;
-                case 'info':
-                    bgColor = 'bg-blue-500';
-                    textColor = 'text-white';
-                    icon = 'fa-info-circle';
-                    break;
-                default:
-                    bgColor = 'bg-gray-500';
-                    textColor = 'text-white';
-                    icon = 'fa-info-circle';
-            }
+            const params = new URLSearchParams({
+                action: 'export_users',
+                search: search,
+                status_filter: statusFilter,
+                role_filter: roleFilter
+            });
             
-            alertDiv.className += ` ${bgColor} ${textColor}`;
-            alertDiv.innerHTML = `
-                <div class="flex items-center">
-                    <i class="fas ${icon} mr-3"></i>
-                    <span>${message}</span>
-                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(alertDiv);
-            
-            // Animate in
-            setTimeout(() => {
-                alertDiv.classList.remove('translate-x-full');
-            }, 100);
-            
-            // Auto remove after 5 seconds
-            setTimeout(() => {
-                alertDiv.classList.add('translate-x-full');
-                setTimeout(() => {
-                    if (alertDiv.parentNode) {
-                        alertDiv.remove();
-                    }
-                }, 300);
-            }, 5000);
+            window.open(`../../assets/php/user_actions.php?${params}`, '_blank');
         }
 
         function logout() {
@@ -1224,51 +834,94 @@ $stats = $userHandler->getUserStats();
             }
         }
 
-        // Close modals when clicking outside
-               // Close modals when clicking outside
-        document.addEventListener('click', function(e) {
-            const modals = [
-                'addUserModal', 
-                'editUserModal', 
-                'userDetailModal', 
-                'messageModal', 
-                'bulkActionModal'
-            ];
-            
-            modals.forEach(modalId => {
-                const modal = document.getElementById(modalId);
-                if (e.target === modal) {
-                    modal.classList.add('hidden');
-                }
-            });
-        });
+        // Utility Functions
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // ESC to close modals
-            if (e.key === 'Escape') {
-                const modals = [
-                    'addUserModal', 
-                    'editUserModal', 
-                    'userDetailModal', 
-                    'messageModal', 
-                    'bulkActionModal'
-                ];
-                
-                modals.forEach(modalId => {
-                    const modal = document.getElementById(modalId);
-                    if (!modal.classList.contains('hidden')) {
-                        modal.classList.add('hidden');
-                    }
-                });
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getRoleColorClass(role) {
+            switch(role) {
+                case 'admin': return 'bg-red-100 text-red-800';
+                case 'premium': return 'bg-purple-100 text-purple-800';
+                default: return 'bg-gray-100 text-gray-800';
             }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleString('id-ID', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatTimeAgo(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
             
-            // Ctrl+N to add new user
-            if (e.ctrlKey && e.key === 'n') {
-                e.preventDefault();
-                openAddUserModal();
-            }
-        });
+            if (diffInSeconds < 60) return 'Baru saja';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} menit lalu`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} jam lalu`;
+            return `${Math.floor(diffInSeconds / 86400)} hari lalu`;
+        }
+
+        function parseUserAgent(userAgent) {
+            if (!userAgent) return 'Unknown';
+            
+            // Simple user agent parsing
+            if (userAgent.includes('Chrome')) return 'Chrome';
+            if (userAgent.includes('Firefox')) return 'Firefox';
+            if (userAgent.includes('Safari')) return 'Safari';
+            if (userAgent.includes('Edge')) return 'Edge';
+            return 'Other';
+        }
+
+        function showAlert(type, message) {
+            // Simple alert implementation
+            const alertClass = type === 'success' ? 'bg-green-500' : 
+                              type === 'warning' ? 'bg-yellow-500' : 'bg-red-500';
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `fixed top-4 right-4 ${alertClass} text-white px-6 py-3 rounded-lg shadow-lg z-50`;
+            alertDiv.textContent = message;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
     </script>
 </body>
 </html>

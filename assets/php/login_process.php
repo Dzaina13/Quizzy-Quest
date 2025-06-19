@@ -3,6 +3,12 @@ session_start();
 
 // Include koneksi database
 require_once 'koneksi_db.php';
+require_once 'user_handler.php'; // 👈 TAMBAH INI
+
+// Security headers
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
 
 // Cek apakah request adalah POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -46,20 +52,27 @@ if ($result && $result->num_rows > 0) {
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_role'] = $user['role'];
 
+        // 🔥 PAKE USER HANDLER KAYAK DI LOGOUT
+        try {
+            $userHandler = new UserHandler($koneksi);
+            $userId = $user['user_id'];
+            $sessionId = session_id();
+            
+            // Record login activity
+            $userHandler->recordLogin($userId, $sessionId); // 👈 PAKE METHOD INI
+            
+        } catch (Exception $e) {
+            error_log("Login logging error: " . $e->getMessage());
+        }
+
+        // REDIRECT SESUAI ROLE
         if ($_SESSION['user_role'] == 'admin') {
             header('Location: ../../pages/admin/index.php');
             exit();
-        
-        }else{
-                 // Redirect ke lobby
-        header('Location: ../../pages/dashboard.php');
-        exit();
-
+        } else {
+            header('Location: ../../pages/dashboard.php');
+            exit();
         }
-        
-
-        
-       
         
     } else {
         // Password salah
@@ -73,5 +86,5 @@ if ($result && $result->num_rows > 0) {
 }
 
 // Tutup koneksi
-
+$koneksi->close();
 ?>
