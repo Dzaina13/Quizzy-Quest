@@ -30,7 +30,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 $email = $koneksi->real_escape_string($email);
 
 // Query untuk mencari user berdasarkan email
-$sql = "SELECT user_id, username, email, password_hash FROM users WHERE email = '$email'";
+$sql = "SELECT * FROM users WHERE email = '$email'";
 $result = $koneksi->query($sql);
 
 if ($result && $result->num_rows > 0) {
@@ -44,12 +44,22 @@ if ($result && $result->num_rows > 0) {
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['user_name'] = $user['username'];
         $_SESSION['user_email'] = $user['email'];
+        $_SESSION['user_role'] = $user['role'];
+
+        if ($_SESSION['user_role'] == 'admin') {
+            header('Location: ../../pages/admin/index.php');
+            exit();
+        
+        }else{
+                 // Redirect ke lobby
+        header('Location: ../../pages/dashboard.php');
+        exit();
+
+        }
         
 
         
-        // Redirect ke lobby
-        header('Location: ../../pages/dashboard.php');
-        exit();
+       
         
     } else {
         // Password salah

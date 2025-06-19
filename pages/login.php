@@ -3,9 +3,16 @@ session_start();
 
 // Cek apakah user sudah login
 if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true) {
-    header('Location: dashboard.php');
-    exit();
+    if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+        header('Location: /pages/admin/index.php');
+        exit();
+    } else {
+        // Untuk semua role selain admin
+        header('Location: dashboard.php');
+        exit();
+    }
 }
+
 
 // Konfigurasi halaman
 $page_title = "Quizzy Quest - Login";

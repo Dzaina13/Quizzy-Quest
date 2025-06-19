@@ -99,12 +99,8 @@ if ($sessions_result) {
             theme: {
                 extend: {
                     colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                        }
+                        'pink-gradient-start': '#ff6b9d',
+                        'pink-gradient-end': '#c44569'
                     }
                 }
             }
@@ -118,23 +114,23 @@ if ($sessions_result) {
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-4">
                     <div class="flex items-center">
-                        <div class="bg-gradient-to-r from-purple-500 to-blue-600 p-2 rounded-lg mr-3">
+                        <div class="bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end p-2 rounded-lg mr-3">
                             <i class="fas fa-brain text-white text-xl"></i>
                         </div>
-                        <a href="dashboard.php" class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                        <a href="dashboard.php" class="text-2xl font-bold bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end bg-clip-text text-transparent">
                             Quizzy Quest
                         </a>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
                     <div class="hidden md:flex items-center space-x-6">
-                        <a href="view_quiz.php" class="text-gray-600 hover:text-purple-600 font-medium transition-colors">
+                        <a href="view_quiz.php" class="text-gray-600 hover:text-pink-600 font-medium transition-colors">
                             <i class="fas fa-list mr-2"></i>Quiz
                         </a>
-                        <a href="create_quiz.php" class="text-gray-600 hover:text-purple-600 font-medium transition-colors">
+                        <a href="create_quiz.php" class="text-gray-600 hover:text-pink-600 font-medium transition-colors">
                             <i class="fas fa-plus mr-2"></i>Buat Quiz
                         </a>
-                        <a href="join_room.php" class="text-gray-600 hover:text-purple-600 font-medium transition-colors">
+                        <a href="join_room.php" class="text-gray-600 hover:text-pink-600 font-medium transition-colors">
                             <i class="fas fa-sign-in-alt mr-2"></i>Join Session
                         </a>
                     </div>
@@ -145,17 +141,17 @@ if ($sessions_result) {
                         </div>
                         <div class="relative">
                             <button onclick="toggleUserMenu()" class="flex items-center space-x-2 bg-gray-100 rounded-full p-2 hover:bg-gray-200 transition-colors">
-                                <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
+                                <div class="w-8 h-8 bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end rounded-full flex items-center justify-center">
                                     <i class="fas fa-user text-white text-sm"></i>
                                 </div>
                                 <i class="fas fa-chevron-down text-gray-600 text-xs"></i>
                             </button>
                             <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-50">
                                 <div class="py-1">
-                                    <a href="profile.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                    <a href="profile.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600">
                                         <i class="fas fa-user mr-3"></i>Profile
                                     </a>
-                                    <a href="history.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                    <a href="history.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600">
                                         <i class="fas fa-history mr-3"></i>Riwayat
                                     </a>
                                     <hr class="my-1">
@@ -174,11 +170,11 @@ if ($sessions_result) {
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-8">
         <!-- Welcome Section -->
-        <div class="bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl shadow-lg p-8 text-white mb-8">
+        <div class="bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end rounded-xl shadow-lg p-8 text-white mb-8">
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold mb-2">Selamat datang kembali, <?php echo htmlspecialchars($username); ?>! 🎉</h1>
-                    <p class="text-purple-100 text-lg">Siap untuk membuat quiz yang menakjubkan atau bergabung dalam sesi yang menarik?</p>
+                    <p class="text-pink-100 text-lg">Siap untuk membuat quiz yang menakjubkan atau bergabung dalam sesi yang menarik?</p>
                 </div>
                 <div class="hidden md:block">
                     <i class="fas fa-rocket text-6xl opacity-20"></i>
@@ -190,7 +186,7 @@ if ($sessions_result) {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                 <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                    <div class="p-3 rounded-full bg-pink-100 text-pink-600">
                         <i class="fas fa-clipboard-list text-2xl"></i>
                     </div>
                     <div class="ml-4">
@@ -202,7 +198,7 @@ if ($sessions_result) {
 
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                 <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <div class="p-3 rounded-full bg-pink-100 text-pink-600">
                         <i class="fas fa-chalkboard-teacher text-2xl"></i>
                     </div>
                     <div class="ml-4">
@@ -214,7 +210,7 @@ if ($sessions_result) {
 
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                 <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <div class="p-3 rounded-full bg-pink-100 text-pink-600">
                         <i class="fas fa-users text-2xl"></i>
                     </div>
                     <div class="ml-4">
@@ -226,7 +222,7 @@ if ($sessions_result) {
 
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                 <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                    <div class="p-3 rounded-full bg-pink-100 text-pink-600">
                         <i class="fas fa-trophy text-2xl"></i>
                     </div>
                     <div class="ml-4">
@@ -241,42 +237,42 @@ if ($sessions_result) {
 
         <!-- Quick Actions -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <a href="create_quiz.php" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 group">
+            <a href="create_quiz.php" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 group hover:border-pink-300">
                 <div class="text-center">
-                    <div class="p-4 rounded-full bg-purple-100 text-purple-600 inline-block group-hover:bg-purple-200 transition-colors">
+                    <div class="p-4 rounded-full bg-pink-100 text-pink-600 inline-block group-hover:bg-pink-200 transition-colors">
                         <i class="fas fa-plus text-3xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800 mt-4">Buat Quiz</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-4 group-hover:text-pink-600">Buat Quiz</h3>
                     <p class="text-gray-600 text-sm">Buat quiz Anda sendiri</p>
                 </div>
             </a>
 
-            <a href="view_quiz.php" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 group">
+            <a href="view_quiz.php" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 group hover:border-pink-300">
                 <div class="text-center">
-                    <div class="p-4 rounded-full bg-blue-100 text-blue-600 inline-block group-hover:bg-blue-200 transition-colors">
+                    <div class="p-4 rounded-full bg-pink-100 text-pink-600 inline-block group-hover:bg-pink-200 transition-colors">
                         <i class="fas fa-list text-3xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800 mt-4">Lihat Quiz</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-4 group-hover:text-pink-600">Lihat Quiz</h3>
                     <p class="text-gray-600 text-sm">Kelola quiz Anda</p>
                 </div>
             </a>
 
-            <a href="join_room.php" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 group">
+            <a href="join_room.php" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 group hover:border-pink-300">
                 <div class="text-center">
-                    <div class="p-4 rounded-full bg-green-100 text-green-600 inline-block group-hover:bg-green-200 transition-colors">
+                    <div class="p-4 rounded-full bg-pink-100 text-pink-600 inline-block group-hover:bg-pink-200 transition-colors">
                         <i class="fas fa-sign-in-alt text-3xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800 mt-4">Join Session</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-4 group-hover:text-pink-600">Join Session</h3>
                     <p class="text-gray-600 text-sm">Masukkan kode sesi</p>
                 </div>
             </a>
 
-            <a href="browse_sessions.php" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 group">
+            <a href="browse_sessions.php" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 group hover:border-pink-300">
                 <div class="text-center">
-                    <div class="p-4 rounded-full bg-yellow-100 text-yellow-600 inline-block group-hover:bg-yellow-200 transition-colors">
+                    <div class="p-4 rounded-full bg-pink-100 text-pink-600 inline-block group-hover:bg-pink-200 transition-colors">
                         <i class="fas fa-search text-3xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800 mt-4">Jelajahi Sesi</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-4 group-hover:text-pink-600">Jelajahi Sesi</h3>
                     <p class="text-gray-600 text-sm">Temukan sesi aktif</p>
                 </div>
             </a>
@@ -290,7 +286,7 @@ if ($sessions_result) {
                     <div class="p-6 border-b border-gray-200">
                         <div class="flex justify-between items-center">
                             <h2 class="text-xl font-bold text-gray-800">Aktivitas Terbaru</h2>
-                            <a href="history.php" class="text-purple-600 hover:text-purple-800 text-sm font-medium">
+                            <a href="history.php" class="text-pink-600 hover:text-pink-800 text-sm font-medium">
                                 Lihat Semua <i class="fas fa-arrow-right ml-1"></i>
                             </a>
                         </div>
@@ -298,8 +294,8 @@ if ($sessions_result) {
                     <div class="p-6">
                         <?php if (empty($recent_activities)): ?>
                             <div class="text-center py-12">
-                                <div class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <i class="fas fa-clock text-gray-400 text-2xl"></i>
+                                <div class="bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-clock text-pink-400 text-2xl"></i>
                                 </div>
                                 <p class="text-gray-500 font-medium mb-2">Belum ada aktivitas terbaru</p>
                                 <p class="text-sm text-gray-400">Mulai dengan membuat quiz atau bergabung dalam sesi!</p>
@@ -307,8 +303,8 @@ if ($sessions_result) {
                         <?php else: ?>
                             <div class="space-y-4">
                                 <?php foreach ($recent_activities as $activity): ?>
-                                    <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <div class="p-3 rounded-full <?php echo $activity['type'] == 'created' ? 'bg-purple-100 text-purple-600' : 'bg-green-100 text-green-600'; ?>">
+                                    <div class="flex items-center space-x-4 p-4 bg-pink-50 rounded-lg hover:bg-pink-100 transition-colors border border-pink-100">
+                                        <div class="p-3 rounded-full <?php echo $activity['type'] == 'created' ? 'bg-pink-200 text-pink-700' : 'bg-pink-200 text-pink-700'; ?>">
                                             <i class="fas <?php echo $activity['type'] == 'created' ? 'fa-plus' : 'fa-play'; ?>"></i>
                                         </div>
                                         <div class="flex-1">
@@ -336,7 +332,7 @@ if ($sessions_result) {
                     <div class="p-6 border-b border-gray-200">
                         <div class="flex justify-between items-center">
                             <h2 class="text-xl font-bold text-gray-800">Sesi Aktif</h2>
-                            <a href="browse_sessions.php" class="text-purple-600 hover:text-purple-800 text-sm font-medium">
+                            <a href="browse_sessions.php" class="text-pink-600 hover:text-pink-800 text-sm font-medium">
                                 Lihat Semua <i class="fas fa-arrow-right ml-1"></i>
                             </a>
                         </div>
@@ -344,22 +340,22 @@ if ($sessions_result) {
                     <div class="p-6">
                         <?php if (empty($active_sessions)): ?>
                             <div class="text-center py-8">
-                                <div class="bg-gray-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <i class="fas fa-users text-gray-400 text-xl"></i>
+                                <div class="bg-pink-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <i class="fas fa-users text-pink-400 text-xl"></i>
                                 </div>
                                 <p class="text-gray-500 text-sm">Tidak ada sesi aktif</p>
                             </div>
                         <?php else: ?>
                             <div class="space-y-4">
                                 <?php foreach ($active_sessions as $session): ?>
-                                    <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors">
+                                    <div class="border border-pink-200 rounded-lg p-4 hover:border-pink-300 transition-colors bg-pink-50">
                                         <h4 class="font-semibold text-gray-800 mb-1"><?php echo htmlspecialchars($session['quiz_title']); ?></h4>
                                         <p class="text-sm text-gray-600 mb-3">oleh <?php echo htmlspecialchars($session['creator']); ?></p>
                                         <div class="flex justify-between items-center">
-                                            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                                            <span class="text-xs text-pink-600 bg-pink-100 px-2 py-1 rounded-full">
                                                 <i class="fas fa-users mr-1"></i><?php echo $session['participant_count']; ?> bergabung
                                             </span>
-                                            <a href="join_room.php" class="bg-green-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-green-600 transition-colors">
+                                            <a href="join_room.php" class="bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end text-white px-3 py-1 rounded-lg text-xs hover:opacity-90 transition-opacity">
                                                 Bergabung
                                             </a>
                                         </div>
@@ -377,19 +373,19 @@ if ($sessions_result) {
                     </div>
                     <div class="p-6">
                         <div class="space-y-3">
-                            <a href="profile.php" class="flex items-center text-gray-600 hover:text-purple-600 p-2 rounded-lg hover:bg-purple-50 transition-all">
+                            <a href="profile.php" class="flex items-center text-gray-600 hover:text-pink-600 p-2 rounded-lg hover:bg-pink-50 transition-all">
                                 <i class="fas fa-user mr-3 w-4"></i>
                                 <span>Profil Saya</span>
                             </a>
-                            <a href="history.php" class="flex items-center text-gray-600 hover:text-purple-600 p-2 rounded-lg hover:bg-purple-50 transition-all">
+                            <a href="history.php" class="flex items-center text-gray-600 hover:text-pink-600 p-2 rounded-lg hover:bg-pink-50 transition-all">
                                 <i class="fas fa-history mr-3 w-4"></i>
                                 <span>Riwayat Quiz</span>
                             </a>
-                            <a href="view_quiz.php" class="flex items-center text-gray-600 hover:text-purple-600 p-2 rounded-lg hover:bg-purple-50 transition-all">
+                            <a href="view_quiz.php" class="flex items-center text-gray-600 hover:text-pink-600 p-2 rounded-lg hover:bg-pink-50 transition-all">
                                 <i class="fas fa-clipboard-list mr-3 w-4"></i>
                                 <span>Kelola Quiz</span>
                             </a>
-                            <a href="browse_sessions.php" class="flex items-center text-gray-600 hover:text-purple-600 p-2 rounded-lg hover:bg-purple-50 transition-all">
+                            <a href="browse_sessions.php" class="flex items-center text-gray-600 hover:text-pink-600 p-2 rounded-lg hover:bg-pink-50 transition-all">
                                 <i class="fas fa-search mr-3 w-4"></i>
                                 <span>Cari Sesi</span>
                             </a>
@@ -405,10 +401,10 @@ if ($sessions_result) {
         <div class="max-w-7xl mx-auto px-4 py-8">
             <div class="text-center">
                 <div class="flex items-center justify-center mb-4">
-                    <div class="bg-gradient-to-r from-purple-500 to-blue-600 p-2 rounded-lg mr-3">
+                    <div class="bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end p-2 rounded-lg mr-3">
                         <i class="fas fa-brain text-white"></i>
                     </div>
-                    <span class="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                    <span class="text-xl font-bold bg-gradient-to-r from-pink-gradient-start to-pink-gradient-end bg-clip-text text-transparent">
                         Quizzy Quest
                     </span>
                 </div>
